@@ -1,29 +1,99 @@
 import { useEffect, useRef } from "react";
 
-interface Particle {
+// ============== 类型定义 ==============
+
+interface Star {
+  x: number;
+  y: number;
+  size: number;
+  alpha: number;
+  baseAlpha: number;
+  twinkleSpeed: number;
+  twinklePhase: number;
+  color: string;         // 预计算颜色字符串
+  hasCross: boolean;     // 是否有十字星芒
+  crossColor: string;    // 星芒颜色
+}
+
+interface DustParticle {
   x: number;
   y: number;
   vx: number;
   vy: number;
   size: number;
   alpha: number;
-  maxAlpha: number;
+  baseAlpha: number;
   life: number;
   maxLife: number;
-  // 粒子类型: 'orbit' 星环 | 'atmosphere' 大气层 | 'headphone' 耳麦 | 'spark' 火花
-  type: "orbit" | "atmosphere" | "headphone" | "spark";
-  angle: number;    // 轨道角度
-  radius: number;   // 轨道半径
-  speed: number;    // 轨道速度
+  color: string;
 }
 
-/**
- * 火星 + 大耳麦 粒子背景
- * 
- * 火星球体：中心发光圆，带陨石坑纹理
- * 大耳麦：弧形头梁 + 两侧耳罩
- * 粒子系统：星环轨道粒子 + 大气层粒子 + 耳麦微光粒子 + 随机火花
- */
+interface Meteor {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  alpha: number;
+  trail: { x: number; y: number; alpha: number }[];
+  color: string;
+  life: number;
+}
+
+interface MouseTrail {
+  x: number;
+  y: number;
+  alpha: number;
+}
+
+// ============== 常量 ==============
+
+const STAR_COUNT = 400;
+const DUST_COUNT = 300;
+const TRAIL_LENGTH = 20;
+const MOUSE_TRAIL_MAX = 8;
+const MOUSE_INFLUENCE = 150;
+const METEOR_MIN_INTERVAL = 180; // 帧
+const METEOR_MAX_INTERVAL = 360;
+
+// 预计算颜色
+const STAR_COLORS: { color: string; crossColor: string }[] = [
+  { color: "rgba(255,255,255,", crossColor: "rgba(255,255,255," },
+  { color: "rgba(220,230,255,", crossColor: "rgba(220,230,255," },
+  { color: "rgba(200,220,255,", crossColor: "rgba(200,220,255," },
+  { color: "rgba(255,245,220,", crossColor: "rgba(255,245,220," },
+  { color: "rgba(255,220,180,", crossColor: "rgba(255,220,180," },
+  { color: "rgba(255,200,160,", crossColor: "rgba(255,200,160," },
+  { color: "rgba(200,210,255,", crossColor: "rgba(200,210,255," },
+  { color: "rgba(255,255,240,", crossColor: "rgba(255,255,240," },
+  { color: "rgba(255,230,200,", crossColor: "rgba(255,230,200," },
+  { color: "rgba(240,240,255,", crossColor: "rgba(240,240,255," },
+];
+
+const DUST_COLORS: string[] = [
+  "rgba(255,200,150,",
+  "rgba(255,180,120,",
+  "rgba(255,220,170,",
+  "rgba(255,160,100,",
+  "rgba(255,240,200,",
+  "rgba(255,140,80,",
+  "rgba(212,75,61,",     // 品牌荔枝红
+];
+
+const METEOR_COLORS: string[] = [
+  "rgba(255,255,255,",
+  "rgba(220,230,255,",
+  "rgba(255,240,220,",
+  "rgba(255,220,180,",
+];
+
+// ============== 工具函数 ==============
+
+const rand = (min: number, max: number) => min + Math.random() * (max - min);
+const randInt = (min: number, max: number) => Math.floor(rand(min, max));
+const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+// ============== 组件 ==============
 
 export default function EarParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -31,14 +101,18 @@ export default function EarParticles() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
     let animationId = 0;
     let mouseX = -1000;
     let mouseY = -1000;
+    let prevMouseX = -1000;
+    let prevMouseY = -1000;
     let time = 0;
+    let nextMeteorAt = randInt(METEOR_MIN_INTERVAL, METEOR_MAX_INTERVAL);
 
+    // ========== Resize ==========
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = window.innerWidth * dpr;
@@ -48,412 +122,319 @@ export default function EarParticles() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
-    // 计算火星中心（页面中心偏上一点，给耳麦头梁留空间）
-    const getMarsCenter = () => ({
-      cx: window.innerWidth / 2,
-      cy: window.innerHeight / 2 - 20,
-    });
-
-    const marsRadius = () => Math.min(window.innerWidth, window.innerHeight) * 0.2;
-
-    const createParticle = (cx: number, cy: number, r: number): Particle => {
-      const rand = Math.random();
-
-      if (rand < 0.45) {
-        // 星环粒子 - 椭圆轨道
-        const angle = Math.random() * Math.PI * 2;
-        const ringRadius = r * (1.3 + Math.random() * 1.0);
-        return {
-          x: cx + Math.cos(angle) * ringRadius * 1.5,
-          y: cy + Math.sin(angle) * ringRadius * 0.4,
-          vx: 0,
-          vy: 0,
-          size: Math.random() * 1.2 + 0.3,
-          alpha: 0,
-          maxAlpha: Math.random() * 0.5 + 0.2,
-          life: Math.random() * 300,
-          maxLife: 300,
-          type: "orbit",
-          angle,
-          radius: ringRadius,
-          speed: (Math.random() * 0.003 + 0.002) * (Math.random() > 0.5 ? 1 : -1),
-        };
-      } else if (rand < 0.70) {
-        // 大气层粒子 - 火星表面附近
-        const angle = Math.random() * Math.PI * 2;
-        const dist = r * (0.85 + Math.random() * 0.3);
-        return {
-          x: cx + Math.cos(angle) * dist,
-          y: cy + Math.sin(angle) * dist,
-          vx: (Math.random() - 0.5) * 0.2,
-          vy: (Math.random() - 0.5) * 0.2,
-          size: Math.random() * 1.5 + 0.5,
-          alpha: 0,
-          maxAlpha: Math.random() * 0.35 + 0.15,
-          life: Math.random() * 200,
-          maxLife: 200,
-          type: "atmosphere",
-          angle,
-          radius: dist,
-          speed: (Math.random() - 0.5) * 0.004,
-        };
-      } else if (rand < 0.90) {
-        // 耳麦粒子 - 头梁和耳罩上
-        const isLeft = Math.random() > 0.5;
-        const sideSign = isLeft ? -1 : 1;
-        const headphoneAngle = Math.random() * Math.PI * 2;
-        const earCupDist = r * (0.95 + Math.random() * 0.2);
-        // 耳罩位置在火星两侧
-        const cupX = cx + sideSign * (r + 25 + Math.random() * 30);
-        const cupY = cy + (Math.random() - 0.5) * r * 0.6;
-        return {
-          x: cupX,
-          y: cupY,
-          vx: (Math.random() - 0.5) * 0.15,
-          vy: (Math.random() - 0.5) * 0.15,
-          size: Math.random() * 1.0 + 0.3,
-          alpha: 0,
-          maxAlpha: Math.random() * 0.4 + 0.2,
-          life: Math.random() * 150,
-          maxLife: 150,
-          type: "headphone",
-          angle: headphoneAngle,
-          radius: earCupDist,
-          speed: 0,
-        };
-      } else {
-        // 随机火花
-        const angle = Math.random() * Math.PI * 2;
-        const dist = r * (1.0 + Math.random() * 2.0);
-        return {
-          x: cx + Math.cos(angle) * dist,
-          y: cy + Math.sin(angle) * dist,
-          vx: (Math.random() - 0.5) * 1.5,
-          vy: (Math.random() - 0.5) * 1.5 - 0.5,
-          size: Math.random() * 0.8 + 0.2,
-          alpha: 0,
-          maxAlpha: Math.random() * 0.7 + 0.3,
-          life: Math.random() * 80,
-          maxLife: 80,
-          type: "spark",
-          angle,
-          radius: dist,
-          speed: 0,
-        };
-      }
+    // ========== 初始化 ==========
+    const createStar = (): Star => {
+      const colorData = pick(STAR_COLORS);
+      return {
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        size: rand(0.3, 2.5),
+        alpha: 0,
+        baseAlpha: rand(0.3, 1.0),
+        twinkleSpeed: rand(0.02, 0.08),
+        twinklePhase: Math.random() * Math.PI * 2,
+        color: colorData.color,
+        hasCross: Math.random() < 0.1,
+        crossColor: colorData.crossColor,
+      };
     };
 
-    const initParticles = () => {
-      const { cx, cy } = getMarsCenter();
-      const r = marsRadius();
-      return Array.from({ length: 1800 }, () => createParticle(cx, cy, r));
+    const createDust = (): DustParticle => {
+      return {
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        size: rand(0.3, 1.0),
+        alpha: 0,
+        baseAlpha: rand(0.2, 0.6),
+        life: randInt(200, 600),
+        maxLife: randInt(400, 800),
+        color: pick(DUST_COLORS),
+      };
     };
 
-    let particles = initParticles();
+    const createMeteor = (): Meteor => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const angle = rand(-0.4, -0.2); // 左上到右下
+      const speed = rand(6, 12);
+      const startX = rand(w * 0.1, w * 0.9);
+      const startY = rand(0, h * 0.3);
+      return {
+        x: startX,
+        y: startY,
+        vx: Math.cos(angle) * speed,
+        vy: -Math.sin(angle) * speed,
+        size: rand(1.0, 2.0),
+        alpha: 1,
+        trail: [],
+        color: pick(METEOR_COLORS),
+        life: randInt(30, 55),
+      };
+    };
 
+    let stars: Star[] = Array.from({ length: STAR_COUNT }, createStar);
+    let dustParticles: DustParticle[] = Array.from({ length: DUST_COUNT }, createDust);
+    let meteors: Meteor[] = [];
+    let mouseTrails: MouseTrail[] = [];
+
+    // ========== 事件处理 ==========
     const handleMouseMove = (e: MouseEvent) => {
+      prevMouseX = mouseX;
+      prevMouseY = mouseY;
       mouseX = e.clientX;
       mouseY = e.clientY;
+
+      // 在鼠标路径上留下光点
+      const dx = mouseX - prevMouseX;
+      const dy = mouseY - prevMouseY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 5 && prevMouseX > 0) {
+        const steps = Math.min(Math.floor(dist / 8), 5);
+        for (let i = 1; i <= steps; i++) {
+          const t = i / steps;
+          mouseTrails.push({
+            x: prevMouseX + dx * t,
+            y: prevMouseY + dy * t,
+            alpha: 0.5 * (1 - t * 0.5),
+          });
+        }
+      }
     };
 
     const handleResize = () => {
       resize();
-      const { cx, cy } = getMarsCenter();
-      const r = marsRadius();
-      particles = Array.from({ length: 1800 }, () => createParticle(cx, cy, r));
+      stars = Array.from({ length: STAR_COUNT }, createStar);
+      dustParticles = Array.from({ length: DUST_COUNT }, createDust);
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     window.addEventListener("resize", handleResize);
 
-    /**
-     * 绘制火星球体
-     */
-    const drawMars = (cx: number, cy: number, r: number) => {
-      // 外层光晕
-      const outerGlow = ctx.createRadialGradient(cx, cy, r * 0.6, cx, cy, r * 1.3);
-      outerGlow.addColorStop(0, "rgba(212, 75, 61, 0.15)");
-      outerGlow.addColorStop(0.5, "rgba(212, 75, 61, 0.05)");
-      outerGlow.addColorStop(1, "rgba(212, 75, 61, 0)");
-      ctx.fillStyle = outerGlow;
+    // ========== 绘制 ==========
+    const drawCosmicGlow = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      // 极微弱的深蓝紫径向渐变
+      const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.7);
+      grad.addColorStop(0, "rgba(20,15,40,0.03)");
+      grad.addColorStop(0.4, "rgba(10,8,25,0.02)");
+      grad.addColorStop(1, "rgba(5,5,8,0)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+    };
+
+    const drawStar = (s: Star) => {
+      const a = s.alpha;
+      if (a < 0.02) return;
+
+      // 星点本体
       ctx.beginPath();
-      ctx.arc(cx, cy, r * 1.3, 0, Math.PI * 2);
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fillStyle = s.color + a + ")";
       ctx.fill();
 
-      // 火星球体主体 - 多层渐变模拟球体光照
-      const bodyGrad = ctx.createRadialGradient(cx - r * 0.25, cy - r * 0.25, r * 0.05, cx, cy, r);
-      bodyGrad.addColorStop(0, "rgba(240, 100, 60, 0.25)");   // 高光
-      bodyGrad.addColorStop(0.3, "rgba(212, 75, 61, 0.18)");
-      bodyGrad.addColorStop(0.6, "rgba(180, 45, 35, 0.12)");
-      bodyGrad.addColorStop(0.85, "rgba(120, 25, 20, 0.06)");
-      bodyGrad.addColorStop(1, "rgba(60, 10, 10, 0)");
-      ctx.fillStyle = bodyGrad;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 火星边缘暗环
-      const edgeGrad = ctx.createRadialGradient(cx, cy, r * 0.85, cx, cy, r);
-      edgeGrad.addColorStop(0, "transparent");
-      edgeGrad.addColorStop(1, "rgba(212, 75, 61, 0.06)");
-      ctx.fillStyle = edgeGrad;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 陨石坑（随机分布几个暗色椭圆）
-      const craters = [
-        { rx: r * 0.35, ry: r * 0.3, ax: r * 0.25, ay: -r * 0.1, rot: 0.2 },
-        { rx: r * 0.15, ry: r * 0.12, ax: r * 0.3, ay: r * 0.35, rot: -0.3 },
-        { rx: r * 0.12, ry: r * 0.1, ax: -r * 0.2, ay: r * 0.25, rot: 0.5 },
-        { rx: r * 0.2, ry: r * 0.16, ax: -r * 0.3, ay: -r * 0.3, rot: -0.15 },
-        { rx: r * 0.08, ry: r * 0.07, ax: r * 0.1, ay: -r * 0.5, rot: 0.4 },
-        { rx: r * 0.1, ry: r * 0.09, ax: -r * 0.4, ay: r * 0.1, rot: -0.6 },
-        { rx: r * 0.06, ry: r * 0.05, ax: r * 0.45, ay: -r * 0.2, rot: 0.1 },
-      ];
-
-      for (const crater of craters) {
-        ctx.save();
-        ctx.translate(cx + crater.ax, cy + crater.ay);
-        ctx.rotate(crater.rot);
+      // 十字星芒
+      if (s.hasCross && s.size > 1.0) {
+        const crossLen = s.size * 6;
+        const crossA = a * 0.35;
+        ctx.strokeStyle = s.crossColor + crossA + ")";
+        ctx.lineWidth = 0.4;
         ctx.beginPath();
-        ctx.ellipse(0, 0, crater.rx, crater.ry, 0, 0, Math.PI * 2);
-        const craterGrad = ctx.createRadialGradient(0, 0, crater.rx * 0.1, 0, 0, crater.rx);
-        craterGrad.addColorStop(0, "rgba(80, 15, 10, 0.12)");
-        craterGrad.addColorStop(1, "rgba(212, 75, 61, 0.04)");
-        ctx.fillStyle = craterGrad;
+        ctx.moveTo(s.x - crossLen, s.y);
+        ctx.lineTo(s.x + crossLen, s.y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y - crossLen);
+        ctx.lineTo(s.x, s.y + crossLen);
+        ctx.stroke();
+      }
+
+      // 亮星光晕
+      if (s.size > 1.5) {
+        const glowGrad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 4);
+        glowGrad.addColorStop(0, s.color + a * 0.25 + ")");
+        glowGrad.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = glowGrad;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size * 4, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
       }
     };
 
-    /**
-     * 绘制大耳麦
-     */
-    const drawHeadphone = (cx: number, cy: number, r: number) => {
-      const headphoneColor = "rgba(180, 180, 190, 0.15)";
-
-      // 头梁 - 弧形从火星顶部跨过
-      const headbandRadius = r * 1.15;
-
-      ctx.save();
-      ctx.strokeStyle = headphoneColor;
-      ctx.lineWidth = 5;
-      ctx.lineCap = "round";
+    const drawDust = (d: DustParticle) => {
+      if (d.alpha < 0.02) return;
+      // 带光晕的粒子
+      const glowGrad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.size * 2.5);
+      glowGrad.addColorStop(0, d.color + d.alpha + ")");
+      glowGrad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glowGrad;
       ctx.beginPath();
-      ctx.arc(cx, cy - r * 0.25, headbandRadius, Math.PI * 1.05, Math.PI * 1.95);
-      ctx.stroke();
-
-      // 头梁内层（更亮）
-      ctx.strokeStyle = "rgba(200, 200, 210, 0.08)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(cx, cy - r * 0.25, headbandRadius + 3, Math.PI * 1.05, Math.PI * 1.95);
-      ctx.stroke();
-      ctx.restore();
-
-      // 左侧耳罩
-      drawEarcup(cx - r - 15, cy, r * 0.35);
-      // 右侧耳罩
-      drawEarcup(cx + r + 15, cy, r * 0.35);
-
-      // 连接臂（从头梁到耳罩）
-      ctx.save();
-      ctx.strokeStyle = headphoneColor;
-      ctx.lineWidth = 3;
-      ctx.lineCap = "round";
-
-      // 左连接臂
-      const leftBandAngle = Math.PI * 1.05;
-      const leftBandX = cx + Math.cos(leftBandAngle) * headbandRadius;
-      const leftBandY = cy - r * 0.25 + Math.sin(leftBandAngle) * headbandRadius;
-      ctx.beginPath();
-      ctx.moveTo(leftBandX, leftBandY);
-      ctx.lineTo(cx - r - 15, cy - r * 0.2);
-      ctx.stroke();
-
-      // 右连接臂
-      const rightBandAngle = Math.PI * 1.95;
-      const rightBandX = cx + Math.cos(rightBandAngle) * headbandRadius;
-      const rightBandY = cy - r * 0.25 + Math.sin(rightBandAngle) * headbandRadius;
-      ctx.beginPath();
-      ctx.moveTo(rightBandX, rightBandY);
-      ctx.lineTo(cx + r + 15, cy - r * 0.2);
-      ctx.stroke();
-
-      ctx.restore();
-    };
-
-    /**
-     * 绘制单个耳罩
-     */
-    const drawEarcup = (x: number, y: number, size: number) => {
-      // 耳罩外框（圆角矩形）
-      ctx.save();
-      ctx.fillStyle = "rgba(50, 50, 60, 0.12)";
-      ctx.strokeStyle = "rgba(180, 180, 190, 0.15)";
-      ctx.lineWidth = 2;
-      const cupW = size * 0.7;
-      const cupH = size * 1.1;
-      roundRect(x - cupW / 2, y - cupH / 2, cupW, cupH, cupW * 0.4);
-
-      // 耳罩内圈
-      ctx.fillStyle = "rgba(30, 30, 40, 0.1)";
-      ctx.strokeStyle = "rgba(212, 75, 61, 0.1)";
-      ctx.lineWidth = 1.5;
-      roundRect(x - cupW * 0.35, y - cupH * 0.35, cupW * 0.7, cupH * 0.7, cupW * 0.3);
-
-      // 耳罩连接环
-      ctx.fillStyle = "rgba(150, 150, 160, 0.08)";
-      ctx.strokeStyle = "rgba(180, 180, 190, 0.1)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(x, y - cupH * 0.45, cupW * 0.15, 0, Math.PI * 2);
+      ctx.arc(d.x, d.y, d.size * 2.5, 0, Math.PI * 2);
       ctx.fill();
-      ctx.stroke();
-
-      ctx.restore();
     };
 
-    /**
-     * 绘制圆角矩形路径
-     */
-    const roundRect = (x: number, y: number, w: number, h: number, r: number) => {
+    const drawMeteor = (m: Meteor) => {
+      // 拖尾
+      for (let i = 0; i < m.trail.length; i++) {
+        const t = m.trail[i];
+        const trailAlpha = (i / m.trail.length) * m.alpha;
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, m.size * (0.3 + (i / m.trail.length) * 0.7), 0, Math.PI * 2);
+        ctx.fillStyle = m.color + trailAlpha * 0.6 + ")";
+        ctx.fill();
+      }
+
+      // 头部
+      const headGrad = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.size * 4);
+      headGrad.addColorStop(0, m.color + m.alpha + ")");
+      headGrad.addColorStop(0.3, m.color + m.alpha * 0.5 + ")");
+      headGrad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = headGrad;
       ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + w - r, y);
-      ctx.arcTo(x + w, y, x + w, y + r, r);
-      ctx.lineTo(x + w, y + h - r);
-      ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-      ctx.lineTo(x + r, y + h);
-      ctx.arcTo(x, y + h, x, y + h - r, r);
-      ctx.lineTo(x, y + r);
-      ctx.arcTo(x, y, x + r, y, r);
-      ctx.closePath();
+      ctx.arc(m.x, m.y, m.size * 4, 0, Math.PI * 2);
       ctx.fill();
-      ctx.stroke();
     };
 
+    const drawMouseTrails = () => {
+      for (const t of mouseTrails) {
+        if (t.alpha < 0.01) continue;
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,200,150,${t.alpha})`;
+        ctx.fill();
+      }
+    };
+
+    // ========== 动画循环 ==========
     const animate = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      const { cx, cy } = getMarsCenter();
-      const r = marsRadius();
+      const w = window.innerWidth;
+      const h = window.innerHeight;
       time++;
 
-      // 拖尾效果
-      ctx.fillStyle = "rgba(5, 5, 5, 0.32)";
-      ctx.fillRect(0, 0, width, height);
+      // 全屏纯黑填充（不留拖尾）
+      ctx.fillStyle = "#050508";
+      ctx.fillRect(0, 0, w, h);
 
-      // 绘制火星球体
-      drawMars(cx, cy, r);
+      // 宇宙底色
+      drawCosmicGlow();
 
-      // 绘制大耳麦
-      drawHeadphone(cx, cy, r);
+      // --- 更新星空 ---
+      for (const s of stars) {
+        s.twinklePhase += s.twinkleSpeed;
+        s.alpha = s.baseAlpha * (0.5 + 0.5 * Math.sin(s.twinklePhase));
+      }
 
-      // 更新和绘制粒子
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-
-        // 根据类型更新位置
-        if (p.type === "orbit") {
-          p.angle += p.speed;
-          p.x = cx + Math.cos(p.angle) * p.radius * 1.5;
-          p.y = cy + Math.sin(p.angle) * p.radius * 0.4;
-        } else if (p.type === "headphone") {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.vx *= 0.99;
-          p.vy *= 0.99;
-        } else if (p.type === "atmosphere") {
-          p.angle += p.speed;
-          p.x += p.vx + Math.cos(p.angle) * 0.1;
-          p.y += p.vy + Math.sin(p.angle) * 0.1;
-          p.vx *= 0.99;
-          p.vy *= 0.99;
-        } else if (p.type === "spark") {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.vy += 0.02; // 轻微重力
-          p.vx *= 0.98;
-          p.vy *= 0.98;
+      // --- 更新光粒 ---
+      for (const d of dustParticles) {
+        // 布朗运动
+        d.vx += (Math.random() - 0.5) * 0.03;
+        d.vy += (Math.random() - 0.5) * 0.03;
+        d.vx *= 0.98;
+        d.vy *= 0.98;
+        // 限制最大速度
+        const spd = Math.sqrt(d.vx * d.vx + d.vy * d.vy);
+        if (spd > 0.3) {
+          d.vx = (d.vx / spd) * 0.3;
+          d.vy = (d.vy / spd) * 0.3;
         }
 
-        // 鼠标交互
-        const dxMouse = p.x - mouseX;
-        const dyMouse = p.y - mouseY;
-        const distMouse = Math.sqrt(dxMouse ** 2 + dyMouse ** 2);
-        const interactionRadius = 150;
-        if (distMouse < interactionRadius && distMouse > 0) {
-          const force = (interactionRadius - distMouse) / interactionRadius;
-          p.x += (dxMouse / distMouse) * force * 2;
-          p.y += (dyMouse / distMouse) * force * 2;
+        // 鼠标引力
+        const dx = mouseX - d.x;
+        const dy = mouseY - d.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MOUSE_INFLUENCE && dist > 1) {
+          const force = (1 - dist / MOUSE_INFLUENCE) * 0.08;
+          d.vx += (dx / dist) * force;
+          d.vy += (dy / dist) * force;
         }
 
-        p.life--;
-        const fadeIn = Math.min(p.life / 30, 1);
-        const fadeOut = p.type === "spark"
-          ? 1
-          : Math.min((p.maxLife - p.life) / 50, 1);
-        p.alpha = Math.min(fadeIn, fadeOut) * p.maxAlpha;
+        d.x += d.vx;
+        d.y += d.vy;
 
-        // 重置死掉的粒子
-        if (p.life <= 0) {
-          const newP = createParticle(cx, cy, r);
-          particles[i] = newP;
+        // 边界循环
+        if (d.x < -10) d.x = w + 10;
+        if (d.x > w + 10) d.x = -10;
+        if (d.y < -10) d.y = h + 10;
+        if (d.y > h + 10) d.y = -10;
+
+        // 生命周期淡入淡出
+        d.life--;
+        if (d.life <= 0) {
+          const fresh = createDust();
+          Object.assign(d, fresh);
+          d.alpha = 0;
         }
+        const fadeIn = Math.min(1, (d.maxLife - d.life) / 30);
+        const fadeOut = Math.min(1, d.life / 40);
+        d.alpha = d.baseAlpha * Math.min(fadeIn, fadeOut);
+      }
 
-        if (p.alpha > 0.01) {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-
-          if (p.type === "orbit") {
-            const brightness = 160 + Math.random() * 80;
-            ctx.fillStyle = `rgba(${brightness}, ${brightness * 0.4}, ${brightness * 0.2}, ${p.alpha})`;
-          } else if (p.type === "atmosphere") {
-            const r2 = 212 + Math.random() * 43;
-            const g = 55 + Math.random() * 50;
-            const b = 35 + Math.random() * 30;
-            ctx.fillStyle = `rgba(${r2}, ${g}, ${b}, ${p.alpha})`;
-          } else if (p.type === "headphone") {
-            const brt = 150 + Math.random() * 80;
-            ctx.fillStyle = `rgba(${brt}, ${brt}, ${brt + 20}, ${p.alpha})`;
-          } else {
-            ctx.fillStyle = `rgba(255, 180, 100, ${p.alpha})`;
-          }
-          ctx.fill();
-
-          // 大粒子光晕
-          if (p.size > 0.8 && p.type !== "spark") {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
-            ctx.fillStyle = p.type === "orbit"
-              ? `rgba(255, 150, 80, ${p.alpha * 0.08})`
-              : `rgba(212, 75, 61, ${p.alpha * 0.06})`;
-            ctx.fill();
-          }
+      // --- 鼠标推开星星 ---
+      for (const s of stars) {
+        const dx = s.x - mouseX;
+        const dy = s.y - mouseY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MOUSE_INFLUENCE && dist > 1) {
+          const force = (1 - dist / MOUSE_INFLUENCE) * 3;
+          s.x += (dx / dist) * force;
+          s.y += (dy / dist) * force;
+        }
+        // 缓慢回到原位（这里我们不存储原位，而是让星星保持在屏幕内）
+        if (s.x < -5 || s.x > w + 5) {
+          s.x = Math.max(-5, Math.min(w + 5, s.x));
+        }
+        if (s.y < -5 || s.y > h + 5) {
+          s.y = Math.max(-5, Math.min(h + 5, s.y));
         }
       }
 
-      // 耳麦微光脉冲
-      if (time % 120 < 60) {
-        const pulseAlpha = 0.03 * (1 - (time % 60) / 60);
-        const leftPulse = ctx.createRadialGradient(cx - r - 15, cy, 0, cx - r - 15, cy, r * 0.3);
-        leftPulse.addColorStop(0, `rgba(212, 75, 61, ${pulseAlpha})`);
-        leftPulse.addColorStop(1, "transparent");
-        ctx.fillStyle = leftPulse;
-        ctx.beginPath();
-        ctx.arc(cx - r - 15, cy, r * 0.3, 0, Math.PI * 2);
-        ctx.fill();
-
-        const rightPulse = ctx.createRadialGradient(cx + r + 15, cy, 0, cx + r + 15, cy, r * 0.3);
-        rightPulse.addColorStop(0, `rgba(212, 75, 61, ${pulseAlpha})`);
-        rightPulse.addColorStop(1, "transparent");
-        ctx.fillStyle = rightPulse;
-        ctx.beginPath();
-        ctx.arc(cx + r + 15, cy, r * 0.3, 0, Math.PI * 2);
-        ctx.fill();
+      // --- 流星 ---
+      if (time >= nextMeteorAt) {
+        meteors.push(createMeteor());
+        nextMeteorAt = time + randInt(METEOR_MIN_INTERVAL, METEOR_MAX_INTERVAL);
       }
+
+      for (let i = meteors.length - 1; i >= 0; i--) {
+        const m = meteors[i];
+        m.trail.push({ x: m.x, y: m.y, alpha: m.alpha });
+        if (m.trail.length > TRAIL_LENGTH) m.trail.shift();
+        m.x += m.vx;
+        m.y += m.vy;
+        m.life--;
+        if (m.life <= 0) {
+          m.alpha -= 0.05;
+        }
+        if (m.alpha <= 0 || m.x < -20 || m.x > w + 20 || m.y > h + 20) {
+          meteors.splice(i, 1);
+        }
+      }
+
+      // --- 鼠标拖尾衰减 ---
+      for (let i = mouseTrails.length - 1; i >= 0; i--) {
+        mouseTrails[i].alpha -= 0.02;
+        if (mouseTrails[i].alpha <= 0) {
+          mouseTrails.splice(i, 1);
+        }
+      }
+      // 限制鼠标拖尾数量
+      while (mouseTrails.length > MOUSE_TRAIL_MAX) {
+        mouseTrails.shift();
+      }
+
+      // ====== 绘制 ======
+      // 1. 光粒（底层）
+      for (const d of dustParticles) drawDust(d);
+
+      // 2. 流星
+      for (const m of meteors) drawMeteor(m);
+
+      // 3. 星空
+      for (const s of stars) drawStar(s);
+
+      // 4. 鼠标光迹
+      drawMouseTrails();
 
       animationId = requestAnimationFrame(animate);
     };
@@ -472,7 +453,7 @@ export default function EarParticles() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 z-0 pointer-events-none"
-      style={{ background: "#050505" }}
+      style={{ background: "#050508" }}
     />
   );
 }
