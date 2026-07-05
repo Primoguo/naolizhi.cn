@@ -23,7 +23,7 @@ export default function Footer() {
               下载
             </a>
             <a
-              href="https://github.com/Primoguo/VoiceReader"
+              href="https://github.com/Primoguo/naolizhi.cn"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"

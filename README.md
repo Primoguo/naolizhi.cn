@@ -1,73 +1,72 @@
-# React + TypeScript + Vite
+# 挠荔枝 Knowledge
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+挠荔枝 Knowledge 是一款 iOS 有声阅读器 App 的产品官网。
 
-Currently, two official plugins are available:
+> **用耳朵，读世界**  
+> 导入 PDF、Word、网页或电子书，挠荔枝将它变成你的专属有声书。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[在线预览](https://naolizhi.cn) · [App Store 下载](https://apps.apple.com/app/id6742556743) · [GitHub](https://github.com/Primoguo/naolizhi.cn)
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 功能特性
 
-## Expanding the ESLint configuration
+- **多格式导入**：PDF、EPUB、Word、Excel、PPT、Markdown、TXT、网页链接
+- **智能朗读**：18 种语言自动检测，阅读位置实时高亮跟随
+- **随心配置**：8 档语速、音高、音量，明暗主题切换
+- **网页一键朗读**：Safari 分享扩展直接发送到 App
+- **后台播放**：锁屏后继续朗读，支持锁屏控件
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 技术栈
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **框架**：React 19
+- **语言**：TypeScript
+- **构建**：Vite 7
+- **样式**：Tailwind CSS 3
+- **UI 组件**：shadcn/ui
+- **图标**：Lucide React
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 本地开发
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# 安装依赖
+npm install
+
+# 启动开发服务器
+npm run dev
+
+# 构建生产版本
+npm run build
+
+# 预览生产构建
+npm run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 项目结构
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+.
+├── index.html          # 入口 HTML（含 SEO / OG 元数据）
+├── src/
+│   ├── App.tsx         # 根组件
+│   ├── sections/       # Landing Page 页面区块
+│   └── components/ui/  # shadcn/ui 组件
+├── public/             # 静态资源（logo、OG 图片、favicon）
+└── package.json
+```
+
+## SEO 信息
+
+- **标题**：挠荔枝 Knowledge - 用耳朵阅读，让文档变成有声书
+- **描述**：挠荔枝 Knowledge 是一款 iOS 有声阅读器，支持 PDF、EPUB、Word、网页等 9 种格式导入，18 种语言智能朗读。
+- **关键词**：有声阅读、文字转语音、TTS、语音朗读、文档朗读、iOS 阅读器、挠荔枝
+
+## 品牌
+
+- 品牌色：**荔枝红** `#D44B3D`
+- 主题：默认深色
+- 平台要求：iOS 17.0+
+
+---
+
+© 2026 挠荔枝 Knowledge. All rights reserved.
