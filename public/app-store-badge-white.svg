@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 40" width="150" height="40">
-  <rect width="150" height="40" rx="6" fill="#D44B3D"/>
+  <rect width="150" height="40" rx="6" fill="white"/>
   <!-- Apple logo (official shape) -->
-  <svg x="15" y="8" width="24" height="24" viewBox="0 0 56 56" fill="white">
+  <svg x="15" y="8" width="24" height="24" viewBox="0 0 56 56" fill="black">
     <path d="M41.9,29.4c-0.1-2.8,1.1-4.9,3.5-6.5c-1.3-1.9-3.3-2.9-5.9-3.1c-2.5-0.2-5.1,1.5-6.3,1.5c-1.3,0-3.3-1.4-5.4-1.4c-2.8,0.1-5.7,1.6-7.2,4.1c-3,4.9-0.7,12.1,2.1,16.1c1.4,1.9,3,4.1,5.2,4c2.1,0,2.9-1.4,5.4-1.4s3.2,1.4,5.4,1.3c2.2,0,3.6-1.9,5-3.9c1.6-2.2,2.2-4.3,2.3-4.4C44.9,34.3,41.9,33.1,41.9,29.4z M34.3,15.5c1.2-1.4,2-3.3,1.8-5.2c-1.7,0.1-3.8,1.1-5,2.6c-1.1,1.3-2.1,3.3-1.8,5.2C31.1,18.1,33,17,34.3,15.5z"/>
   </svg>
-  <text x="90" y="16" text-anchor="middle" fill="white" font-family="-apple-system, sans-serif" font-size="8" font-weight="500">
+  <text x="90" y="16" text-anchor="middle" fill="black" font-family="-apple-system, sans-serif" font-size="8" font-weight="500">
     Download on the
   </text>
-  <text x="90" y="32" text-anchor="middle" fill="white" font-family="-apple-system, sans-serif" font-size="14" font-weight="700">
+  <text x="90" y="32" text-anchor="middle" fill="black" font-family="-apple-system, sans-serif" font-size="14" font-weight="700">
     App Store
   </text>
 </svg>

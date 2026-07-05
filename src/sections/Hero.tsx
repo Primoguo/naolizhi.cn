@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { ArrowDown, Star } from "lucide-react";
 
 export default function Hero() {

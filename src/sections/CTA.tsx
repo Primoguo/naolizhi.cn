@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
 
 export default function CTA() {
@@ -25,17 +24,13 @@ export default function CTA() {
                 href="https://apps.apple.com/app/id6742556743"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="inline-flex rounded-xl bg-white shadow-xl shadow-black/20 hover:shadow-black/30 transition-all hover:-translate-y-0.5"
               >
-                <Button
-                  size="lg"
-                  className="rounded-full bg-white hover:bg-white/90 text-primary text-base px-8 py-6 shadow-xl transition-all hover:-translate-y-0.5"
-                >
-                  <img
-                    src="/app-store-badge.svg"
-                    alt="App Store"
-                    className="h-10"
-                  />
-                </Button>
+                <img
+                  src="/app-store-badge-white.svg"
+                  alt="Download on the App Store"
+                  className="h-12"
+                />
               </a>
               <a
                 href="#features"
