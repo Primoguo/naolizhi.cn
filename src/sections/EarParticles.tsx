@@ -48,13 +48,21 @@ interface MouseTrail {
 
 // ============== 常量 ==============
 
-const STAR_COUNT = 400;
-const DUST_COUNT = 300;
-const TRAIL_LENGTH = 20;
+const isMobile = () =>
+  typeof window !== "undefined" && window.innerWidth < 768;
+
+const getParticleCounts = () => {
+  if (isMobile()) return { stars: 120, dust: 150 };
+  return { stars: 400, dust: 300 };
+};
+
+const STAR_COUNT = () => getParticleCounts().stars;
+const DUST_COUNT = () => getParticleCounts().dust;
+const TRAIL_LENGTH = 16;
 const MOUSE_TRAIL_MAX = 8;
-const MOUSE_INFLUENCE = 150;
-const METEOR_MIN_INTERVAL = 180; // 帧
-const METEOR_MAX_INTERVAL = 360;
+const MOUSE_INFLUENCE = 120;
+const METEOR_MIN_INTERVAL = 240; // 帧
+const METEOR_MAX_INTERVAL = 480;
 
 // 预计算颜色
 const STAR_COLORS: { color: string; crossColor: string }[] = [
@@ -114,7 +122,8 @@ export default function EarParticles() {
 
     // ========== Resize ==========
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const mobile = isMobile();
+      const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 2 : 2);
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width = `${window.innerWidth}px`;
@@ -174,19 +183,19 @@ export default function EarParticles() {
       };
     };
 
-    let stars: Star[] = Array.from({ length: STAR_COUNT }, createStar);
-    let dustParticles: DustParticle[] = Array.from({ length: DUST_COUNT }, createDust);
+    let stars: Star[] = Array.from({ length: STAR_COUNT() }, createStar);
+    let dustParticles: DustParticle[] = Array.from({ length: DUST_COUNT() }, createDust);
     let meteors: Meteor[] = [];
     let mouseTrails: MouseTrail[] = [];
 
     // ========== 事件处理 ==========
-    const handleMouseMove = (e: MouseEvent) => {
+    const handlePointerMove = (clientX: number, clientY: number) => {
       prevMouseX = mouseX;
       prevMouseY = mouseY;
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+      mouseX = clientX;
+      mouseY = clientY;
 
-      // 在鼠标路径上留下光点
+      // 在路径上留下光点
       const dx = mouseX - prevMouseX;
       const dy = mouseY - prevMouseY;
       const dist = Math.sqrt(dx * dx + dy * dy);
@@ -203,13 +212,30 @@ export default function EarParticles() {
       }
     };
 
+    const handleMouseMove = (e: MouseEvent) => {
+      handlePointerMove(e.clientX, e.clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      mouseX = -1000;
+      mouseY = -1000;
+    };
+
     const handleResize = () => {
       resize();
-      stars = Array.from({ length: STAR_COUNT }, createStar);
-      dustParticles = Array.from({ length: DUST_COUNT }, createDust);
+      stars = Array.from({ length: STAR_COUNT() }, createStar);
+      dustParticles = Array.from({ length: DUST_COUNT() }, createDust);
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd);
     window.addEventListener("resize", handleResize);
 
     // ========== 绘制 ==========
@@ -265,7 +291,17 @@ export default function EarParticles() {
 
     const drawDust = (d: DustParticle) => {
       if (d.alpha < 0.02) return;
-      // 带光晕的粒子
+
+      if (isMobile()) {
+        // 移动端：简单圆点，性能优先
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.size * 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = d.color + d.alpha + ")";
+        ctx.fill();
+        return;
+      }
+
+      // 桌面端：带光晕的粒子
       const glowGrad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.size * 2.5);
       glowGrad.addColorStop(0, d.color + d.alpha + ")");
       glowGrad.addColorStop(1, "rgba(0,0,0,0)");
@@ -333,21 +369,27 @@ export default function EarParticles() {
         d.vy += (Math.random() - 0.5) * 0.03;
         d.vx *= 0.98;
         d.vy *= 0.98;
+
+        if (!isMobile()) {
+          // 桌面端：鼠标引力
+          const dx = mouseX - d.x;
+          const dy = mouseY - d.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MOUSE_INFLUENCE && dist > 1) {
+            const force = (1 - dist / MOUSE_INFLUENCE) * 0.08;
+            d.vx += (dx / dist) * force;
+            d.vy += (dy / dist) * force;
+          }
+        } else {
+          // 移动端：微风效果
+          d.vx += 0.005;
+        }
+
         // 限制最大速度
         const spd = Math.sqrt(d.vx * d.vx + d.vy * d.vy);
         if (spd > 0.3) {
           d.vx = (d.vx / spd) * 0.3;
           d.vy = (d.vy / spd) * 0.3;
-        }
-
-        // 鼠标引力
-        const dx = mouseX - d.x;
-        const dy = mouseY - d.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MOUSE_INFLUENCE && dist > 1) {
-          const force = (1 - dist / MOUSE_INFLUENCE) * 0.08;
-          d.vx += (dx / dist) * force;
-          d.vy += (dy / dist) * force;
         }
 
         d.x += d.vx;
@@ -371,22 +413,23 @@ export default function EarParticles() {
         d.alpha = d.baseAlpha * Math.min(fadeIn, fadeOut);
       }
 
-      // --- 鼠标推开星星 ---
-      for (const s of stars) {
-        const dx = s.x - mouseX;
-        const dy = s.y - mouseY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MOUSE_INFLUENCE && dist > 1) {
-          const force = (1 - dist / MOUSE_INFLUENCE) * 3;
-          s.x += (dx / dist) * force;
-          s.y += (dy / dist) * force;
-        }
-        // 缓慢回到原位（这里我们不存储原位，而是让星星保持在屏幕内）
-        if (s.x < -5 || s.x > w + 5) {
-          s.x = Math.max(-5, Math.min(w + 5, s.x));
-        }
-        if (s.y < -5 || s.y > h + 5) {
-          s.y = Math.max(-5, Math.min(h + 5, s.y));
+      // --- 鼠标推开星星（仅桌面端）---
+      if (!isMobile()) {
+        for (const s of stars) {
+          const dx = s.x - mouseX;
+          const dy = s.y - mouseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MOUSE_INFLUENCE && dist > 1) {
+            const force = (1 - dist / MOUSE_INFLUENCE) * 3;
+            s.x += (dx / dist) * force;
+            s.y += (dy / dist) * force;
+          }
+          if (s.x < -5 || s.x > w + 5) {
+            s.x = Math.max(-5, Math.min(w + 5, s.x));
+          }
+          if (s.y < -5 || s.y > h + 5) {
+            s.y = Math.max(-5, Math.min(h + 5, s.y));
+          }
         }
       }
 
@@ -446,6 +489,8 @@ export default function EarParticles() {
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
     };
   }, []);
 
