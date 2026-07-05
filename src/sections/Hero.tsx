@@ -26,17 +26,15 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-              <a href="#download">
-                <Button
-                  size="lg"
-                  className="rounded-full bg-primary hover:bg-primary/90 text-white text-base px-8 py-6 shadow-xl shadow-primary/30 hover:shadow-primary/40 transition-all hover:-translate-y-0.5"
-                >
-                  <img
-                    src="/app-store-badge.svg"
-                    alt="App Store"
-                    className="h-10 invert brightness-0"
-                  />
-                </Button>
+              <a
+                href="#download"
+                className="inline-flex rounded-md shadow-xl shadow-primary/30 hover:shadow-primary/40 transition-all hover:-translate-y-0.5"
+              >
+                <img
+                  src="/app-store-badge.svg"
+                  alt="Download on the App Store"
+                  className="h-10"
+                />
               </a>
               <a
                 href="#features"
@@ -55,8 +53,21 @@ export default function Hero() {
               <div className="absolute inset-0 rounded-[3rem] bg-primary/20 blur-[60px] scale-90" />
               {/* Phone frame */}
               <div className="relative w-[280px] sm:w-[320px] aspect-[9/19] rounded-[2.5rem] border-4 border-white/10 bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-md overflow-hidden shadow-2xl">
-                {/* Notch */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[40%] h-6 bg-white/90 rounded-b-2xl z-10" />
+                {/* Dynamic Island */}
+                <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[28%] h-5 bg-black rounded-full z-10 flex items-center gap-2 px-2">
+                  <svg className="w-1.5 h-2 text-primary shrink-0 animate-pulse" viewBox="0 0 6 8" fill="currentColor" style={{ animationDuration: "1.2s" }}>
+                    <polygon points="0,0 6,4 0,8" />
+                  </svg>
+                  <div className="flex items-end gap-px h-2 flex-1">
+                    {[3, 5, 2, 6, 3, 4, 2, 5, 3, 6, 2, 4, 3, 5, 2, 4, 3, 6].map((h, i) => (
+                      <div
+                        key={i}
+                        className="w-0.5 rounded-full bg-primary animate-pulse"
+                        style={{ height: `${h}px`, animationDelay: `${i * 0.12}s` }}
+                      />
+                    ))}
+                  </div>
+                </div>
                 {/* Screen placeholder */}
                 <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/10 to-white/5">
                   <div className="text-center px-6">
