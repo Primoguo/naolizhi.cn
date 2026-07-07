@@ -111,15 +111,15 @@ export default function Hero() {
               {/* iPhone 17 Pro Max 机身 */}
               <div className="relative w-[280px] sm:w-[320px] aspect-[9/19] group">
                 {/* 钛金属边框（多层渐变模拟立体感）*/}
-                <div className="absolute inset-0 rounded-[3.5rem] bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 shadow-2xl">
+                <div className="absolute inset-0 rounded-[3.5rem] bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 shadow-2xl">
                   {/* 左侧高光边框 */}
-                  <div className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-[3.5rem] bg-gradient-to-b from-white/30 via-white/10 to-transparent" />
+                  <div className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-[3.5rem] bg-gradient-to-b from-white/60 via-white/30 to-transparent" />
                   {/* 右侧阴影边框 */}
-                  <div className="absolute right-0 top-0 bottom-0 w-[3px] rounded-r-[3.5rem] bg-gradient-to-b from-black/40 via-black/20 to-transparent" />
+                  <div className="absolute right-0 top-0 bottom-0 w-[3px] rounded-r-[3.5rem] bg-gradient-to-b from-black/30 via-black/15 to-transparent" />
                   {/* 顶部高光 */}
-                  <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-[3.5rem] bg-gradient-to-r from-white/20 via-white/10 to-transparent" />
+                  <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-[3.5rem] bg-gradient-to-r from-white/40 via-white/20 to-transparent" />
                   {/* 底部阴影 */}
-                  <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-b-[3.5rem] bg-gradient-to-r from-black/30 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-b-[3.5rem] bg-gradient-to-r from-black/25 via-black/15 to-transparent" />
                 </div>
                 
                 {/* 屏幕区域 */}
@@ -208,9 +208,9 @@ export default function Hero() {
                 </div>
                 
                 {/* 侧面按钮（音量键 + 电源键）*/}
-                <div className="absolute -left-[2px] top-[120px] w-[4px] h-[40px] bg-gradient-to-r from-gray-600 to-gray-700 rounded-l-md border-l border-white/10" />
-                <div className="absolute -left-[2px] top-[180px] w-[4px] h-[40px] bg-gradient-to-r from-gray-600 to-gray-700 rounded-l-md border-l border-white/10" />
-                <div className="absolute -right-[2px] top-[160px] w-[4px] h-[60px] bg-gradient-to-l from-gray-600 to-gray-700 rounded-r-md border-r border-white/10" />
+                <div className="absolute -left-[2px] top-[120px] w-[4px] h-[40px] bg-gradient-to-r from-gray-300 to-gray-400 rounded-l-md border-l border-white/20" />
+                <div className="absolute -left-[2px] top-[180px] w-[4px] h-[40px] bg-gradient-to-r from-gray-300 to-gray-400 rounded-l-md border-l border-white/20" />
+                <div className="absolute -right-[2px] top-[160px] w-[4px] h-[60px] bg-gradient-to-l from-gray-300 to-gray-400 rounded-r-md border-r border-white/20" />
               </div>
             </div>
           </div>
