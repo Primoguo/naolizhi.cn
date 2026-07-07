@@ -174,7 +174,6 @@ const HIGHLIGHTS = [
     title: "AI 智能总结",
     description:
       "导入文档后一键生成摘要，快速掌握核心要点。支持朗读摘要，让 AI 帮你提炼知识精华，节省阅读时间。",
-    reversed: true,
     image: (
       <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-purple-950/80 via-slate-900/90 to-indigo-950/70 border border-purple-500/20 flex items-center justify-center overflow-hidden relative group">
         {/* 网格背景 */}
@@ -264,6 +263,7 @@ const HIGHLIGHTS = [
     title: "AI 伴读",
     description:
       "边听边问，听到不懂的内容随时提问。AI 基于当前朗读位置的上下文回答，支持多轮对话，知识越聊越深入。",
+    reversed: true,
     image: (
       <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-cyan-950/80 via-slate-900/90 to-teal-950/70 border border-cyan-500/20 flex items-center justify-center overflow-hidden relative group">
         {/* 网格背景 */}
@@ -358,7 +358,6 @@ const HIGHLIGHTS = [
     title: "明暗主题，随心切换",
     description:
       "跟随系统自动切换，或手动选择白天/暗黑模式。无论白天办公还是深夜阅读，都有最舒适的色彩体验。",
-    reversed: true,
     image: (
       <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden flex relative border border-white/10">
         {/* ===== 暗黑模式（左侧）===== */}
