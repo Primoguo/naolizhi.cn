@@ -150,56 +150,109 @@ export default function Hero() {
                     </div>
                   </div>
                   
-                  {/* 屏幕内容 */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-neutral-900 to-slate-950">
-                    <div className="text-center px-8 space-y-6">
-                      {/* App 图标 */}
-                      <div className="relative inline-block">
-                        <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-3xl scale-[2]" />
-                        <div className="relative w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-primary/40 via-primary/20 to-purple-500/30 border border-white/10 flex items-center justify-center shadow-xl shadow-primary/20">
-                          <svg
-                            className="w-10 h-10 text-white drop-shadow-lg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={1.5}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"
-                            />
-                          </svg>
+                  {/* 屏幕内容 — 参考 Knowledge App 播放器界面 */}
+                  <div className="absolute inset-0 flex flex-col bg-gradient-to-b from-[#1c1c1e] to-[#0a0a0c]">
+                    {/* 顶部导航栏 */}
+                    <div className="flex items-center justify-between px-5 pt-14 pb-2">
+                      {/* AI 伴读按钮 */}
+                      <div className="w-7 h-7 flex items-center justify-center">
+                        <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                      </div>
+                      <p className="text-[11px] font-semibold text-white/90">正在播放</p>
+                      {/* AI 总结按钮 */}
+                      <div className="w-7 h-7 flex items-center justify-center">
+                        <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* 文档信息头部 */}
+                    <div className="flex items-center gap-3 px-5 py-3">
+                      {/* 文档图标 */}
+                      <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-blue-500/70 to-purple-500/50 flex items-center justify-center shrink-0">
+                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                        </svg>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[12px] font-semibold text-white truncate">认知觉醒</p>
+                        <p className="text-[10px] text-white/40">PDF · 8.2万字</p>
+                      </div>
+                    </div>
+
+                    {/* 高亮文本区域 */}
+                    <div className="flex-1 mx-4 rounded-xl bg-white/[0.04] overflow-hidden px-4 py-3">
+                      <div className="space-y-2.5">
+                        <p className="text-[10px] text-white/50 leading-relaxed font-serif">
+                          所谓厉害的人，就是每天比你多清醒一点点的人。很多时候，我们并非不够努力，而是缺乏对自己行为和思维的觉察。
+                        </p>
+                        <p className="text-[10px] leading-relaxed font-serif">
+                          <span className="text-white/50">当你开始</span>
+                          <span className="text-blue-400 font-bold bg-blue-400/15 px-0.5 rounded">观察自己的注意力</span>
+                          <span className="text-blue-400 font-bold bg-blue-400/15 px-0.5 rounded">去了哪里，时间都花</span>
+                          <span className="text-blue-400 font-bold bg-blue-400/15 px-0.5 rounded">在了什么地方，</span>
+                          <span className="text-white/50">你就已经走在了觉醒的路上。</span>
+                        </p>
+                        <p className="text-[10px] text-white/50 leading-relaxed font-serif">
+                          人与人之间最大的差距，不是智商，不是学历，而是认知觉醒的程度。一个人只有在认知觉醒之后，才能真正掌控自己的人生方向。
+                        </p>
+                        <p className="text-[10px] text-white/35 leading-relaxed font-serif">
+                          而觉醒的第一步，就是意识到自己正处于「无意识」的状态中……
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 进度条 */}
+                    <div className="px-5 pt-3 pb-1">
+                      <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
+                        <div className="w-[35%] h-full rounded-full bg-blue-500" />
+                      </div>
+                      <div className="flex justify-between text-[9px] text-white/35 font-mono mt-1">
+                        <span>02:35</span>
+                        <span>08:42</span>
+                      </div>
+                    </div>
+
+                    {/* 播放控制 */}
+                    <div className="flex items-center justify-center gap-7 py-3">
+                      {/* 快退 15s */}
+                      <div className="w-9 h-9 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
+                        </svg>
+                      </div>
+                      {/* 播放/暂停 */}
+                      <div className="w-14 h-14 rounded-full bg-blue-500/15 flex items-center justify-center">
+                        <svg className="w-7 h-7 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                          <rect x="6" y="4" width="4" height="16" rx="1" />
+                          <rect x="14" y="4" width="4" height="16" rx="1" />
+                        </svg>
+                      </div>
+                      {/* 快进 30s */}
+                      <div className="w-9 h-9 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* 语速快捷档位 */}
+                    <div className="flex items-center justify-center gap-2 pb-8">
+                      {["0.7x", "1x", "1.2x", "1.5x", "2x"].map((speed, i) => (
+                        <div
+                          key={speed}
+                          className={`px-2.5 py-1 rounded-md text-[9px] font-semibold ${
+                            i === 2
+                              ? "bg-blue-500/20 text-blue-400"
+                              : "bg-white/[0.06] text-white/40"
+                          }`}
+                        >
+                          {speed}
                         </div>
-                      </div>
-                      
-                      {/* 文本信息 */}
-                      <div className="space-y-2">
-                        <p className="text-base font-semibold text-white tracking-wide">正在朗读中...</p>
-                        <p className="text-xs text-white/50 font-medium">Chapter 1 · 02:35</p>
-                      </div>
-                      
-                      {/* 音频波形可视化 */}
-                      <div className="flex items-end justify-center gap-[3px] h-12 pt-2">
-                        {[5, 10, 7, 14, 9, 16, 11, 18, 12, 15, 10, 13, 8, 11, 6, 9, 5, 12, 8, 14, 10, 16, 12, 18, 14, 11, 9, 13, 7, 10].map((h, i) => (
-                          <div
-                            key={i}
-                            className="w-[3px] rounded-full bg-gradient-to-t from-primary/80 to-primary/40 animate-pulse"
-                            style={{
-                              height: `${h * 2}px`,
-                              animationDelay: `${i * 0.06}s`,
-                              animationDuration: '1.5s'
-                            }}
-                          />
-                        ))}
-                      </div>
-                      
-                      {/* 底部进度条 */}
-                      <div className="pt-4 px-4">
-                        <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
-                          <div className="w-2/5 h-full rounded-full bg-gradient-to-r from-primary to-purple-500" />
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                   
