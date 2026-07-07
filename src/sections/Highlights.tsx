@@ -174,6 +174,7 @@ const HIGHLIGHTS = [
     title: "AI 智能总结",
     description:
       "导入文档后一键生成摘要，快速掌握核心要点。支持朗读摘要，让 AI 帮你提炼知识精华，节省阅读时间。",
+    reversed: true,
     image: (
       <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-purple-950/80 via-slate-900/90 to-indigo-950/70 border border-purple-500/20 flex items-center justify-center overflow-hidden relative group">
         {/* 网格背景 */}
