@@ -1,4 +1,4 @@
-import { Globe, Headphones, Moon, Share2, FileText, Play, Lock, Music, SkipForward, SkipBack, Sun, Star } from "lucide-react";
+import { Globe, Headphones, Moon, Share2, FileText, Play, Lock, Music, SkipForward, SkipBack, Sun, Star, Sparkles, ListChecks, Volume2 } from "lucide-react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
 const HIGHLIGHTS = [
@@ -253,6 +253,96 @@ const HIGHLIGHTS = [
             </div>
             
             <span className="text-[10px] font-semibold text-indigo-300/60 tracking-wide">夜间模式</span>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    icon: Sparkles,
+    title: "AI 智能总结",
+    description:
+      "导入文档后一键生成摘要，快速掌握核心要点。支持朗读摘要，让 AI 帮你提炼知识精华，节省阅读时间。",
+    reversed: true,
+    image: (
+      <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-purple-950/80 via-slate-900/90 to-indigo-950/70 border border-purple-500/20 flex items-center justify-center overflow-hidden relative group">
+        {/* 网格背景 */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        {/* 多层光晕 */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,rgba(168,85,247,0.2),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_70%,rgba(99,102,241,0.12),transparent_50%)]" />
+        <div className="absolute top-1/3 left-1/3 w-56 h-56 bg-purple-500/10 rounded-full blur-[80px]" />
+        <div className="absolute bottom-1/3 right-1/3 w-40 h-40 bg-indigo-500/8 rounded-full blur-[60px]" />
+        
+        {/* 浮动装饰粒子 */}
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="absolute rounded-full bg-purple-400/25 animate-bounce" style={{ width: `${3 + i % 3}px`, height: `${3 + i % 3}px`, top: `${12 + i * 16}%`, right: `${8 + i * 18}%`, animationDuration: `${2.2 + i * 0.6}s`, animationDelay: `${i * 0.4}s` }} />
+        ))}
+        
+        <div className="relative z-10 w-full px-8 py-6 space-y-5">
+          {/* 模拟播放器界面 */}
+          <div className="mx-auto max-w-sm rounded-2xl bg-white/[0.06] backdrop-blur-xl border border-white/10 overflow-hidden shadow-2xl shadow-purple-500/8">
+            {/* 顶部标题栏 */}
+            <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-white/[0.06]">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-purple-400" />
+                <span className="text-xs font-semibold text-white/80">行业报告.pdf</span>
+              </div>
+              <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
+            </div>
+            
+            {/* 原文内容预览 */}
+            <div className="px-5 py-4 space-y-2">
+              <div className="h-2 w-full rounded-full bg-white/[0.06]" />
+              <div className="h-2 w-5/6 rounded-full bg-white/[0.06]" />
+              <div className="h-2 w-4/6 rounded-full bg-white/[0.04]" />
+            </div>
+            
+            {/* AI 总结按钮 */}
+            <div className="px-5 pb-4">
+              <button className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600/80 to-indigo-600/80 border border-purple-500/30 flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all">
+                <Sparkles className="w-4 h-4 text-white" />
+                <span className="text-xs font-semibold text-white">AI 总结</span>
+              </button>
+            </div>
+            
+            {/* 生成的摘要卡片 */}
+            <div className="mx-5 mb-5 p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 backdrop-blur-md">
+              <div className="flex items-center gap-2 mb-3">
+                <ListChecks className="w-3.5 h-3.5 text-purple-400" />
+                <span className="text-[10px] font-semibold text-purple-300">核心要点</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-start gap-2">
+                  <div className="w-1 h-1 rounded-full bg-purple-400 mt-1.5 shrink-0" />
+                  <div className="h-1.5 w-full rounded-full bg-purple-400/20" />
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-1 h-1 rounded-full bg-purple-400 mt-1.5 shrink-0" />
+                  <div className="h-1.5 w-5/6 rounded-full bg-purple-400/20" />
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-1 h-1 rounded-full bg-purple-400 mt-1.5 shrink-0" />
+                  <div className="h-1.5 w-4/6 rounded-full bg-purple-400/20" />
+                </div>
+              </div>
+              
+              {/* 朗读摘要按钮 */}
+              <button className="mt-3 w-full py-2 rounded-lg bg-white/10 border border-white/10 flex items-center justify-center gap-1.5 hover:bg-white/15 transition-all">
+                <Volume2 className="w-3.5 h-3.5 text-purple-300" />
+                <span className="text-[10px] text-purple-200/90 font-medium">朗读摘要</span>
+              </button>
+            </div>
+          </div>
+          
+          {/* 底部状态提示 */}
+          <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/25">
+              <Sparkles className="w-3 h-3 text-purple-400 animate-pulse" />
+              <span className="text-[10px] text-purple-300/90 font-medium">AI 已就绪</span>
+            </div>
+            <span className="text-[10px] text-white/30">·</span>
+            <span className="text-[10px] text-white/40">通义千问驱动</span>
           </div>
         </div>
       </div>
