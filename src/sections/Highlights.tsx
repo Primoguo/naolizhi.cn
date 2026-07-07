@@ -304,7 +304,7 @@ const HIGHLIGHTS = [
               {/* 用户消息（右对齐） */}
               <div className="flex justify-end animate-chat-fade-in" style={{ animationDelay: '0.2s' }}>
                 <div className="max-w-[75%] px-3.5 py-2.5 rounded-2xl rounded-tr-md bg-cyan-600/40 border border-cyan-500/20">
-                  <p className="text-[11px] text-white/90 leading-relaxed">"元认知"是什么意思？</p>
+                  <p className="text-[11px] text-white/90 leading-relaxed typing-effect" data-text='"元认知"是什么意思？'>"元认知"是什么意思？</p>
                 </div>
               </div>
               
@@ -315,7 +315,7 @@ const HIGHLIGHTS = [
                     <MessageSquare className="w-3 h-3 text-cyan-400" />
                     <span className="text-[9px] font-semibold text-cyan-300">AI 伴读</span>
                   </div>
-                  <p className="text-[11px] text-white/70 leading-relaxed">元认知是指对自己思维过程的认知和监控能力，简单来说就是"思考自己的思考"。</p>
+                  <p className="text-[11px] text-white/70 leading-relaxed typing-effect" data-text='元认知是指对自己思维过程的认知和监控能力，简单来说就是“思考自己的思考”。'>元认知是指对自己思维过程的认知和监控能力，简单来说就是"思考自己的思考"。</p>
                 </div>
               </div>
               

@@ -1,3 +1,4 @@
+import { Files } from "lucide-react";
 import { CardContent } from "@/components/ui/card";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useSpotlight } from "@/hooks/use-spotlight";
@@ -6,20 +7,9 @@ const FEATURES = [
   {
     title: "多格式导入",
     description:
-      "支持 PDF、EPUB、Word、Excel、PPT、Markdown、TXT 和网页链接，覆盖你所有的阅读场景。",
+      "支持 PDF、EPUB、Word 等 9 种格式一键导入，覆盖你所有的阅读场景。",
     iconClass: "text-amber-500",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-7 w-7">
-        {/* 底层文件 */}
-        <path d="M6 8h12v12H6z" rx="2" />
-        {/* 中层文件（偏移）*/}
-        <path d="M8 4h12v12H8z" rx="2" />
-        {/* 顶层文件（再偏移）*/}
-        <path d="M10 0h12v12H10z" rx="2" />
-        {/* 右上角小角标表示“多” */}
-        <circle cx="20" cy="4" r="1.5" fill="currentColor" stroke="none" />
-      </svg>
-    ),
+    icon: <Files className="h-7 w-7" strokeWidth={1.5} />,
   },
   {
     title: "智能朗读",
