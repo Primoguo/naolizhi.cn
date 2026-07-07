@@ -102,6 +102,54 @@
   .reveal-stagger.revealed > *:nth-child(4) { transition-delay: 300ms;  opacity: 1; transform: translateY(0); }
   .reveal-stagger.revealed > *:nth-child(5) { transition-delay: 400ms;  opacity: 1; transform: translateY(0); }
 
+  /* ========== Highlights 卡片动画 ==========
+  /* 流程连接线脉冲 */
+  @keyframes flow-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+  .animate-flow-pulse {
+    animation: flow-pulse 2s ease-in-out infinite;
+  }
+  
+  /* 连接线流动效果 */
+  @keyframes line-flow {
+    0% { background-position: -100% 0; }
+    100% { background-position: 100% 0; }
+  }
+  .animate-line-flow {
+    background: linear-gradient(90deg, transparent 0%, currentColor 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: line-flow 2s linear infinite;
+  }
+  
+  /* 内容行依次淡入 */
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+  
+  /* 标签呼吸灯 */
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+    50% { box-shadow: 0 0 12px 4px rgba(59, 130, 246, 0.2); }
+  }
+  .animate-glow-pulse {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+  
+  /* 网格背景移动 */
+  @keyframes grid-move {
+    0% { background-position: 0 0; }
+    100% { background-position: 24px 24px; }
+  }
+  .animate-grid-move {
+    animation: grid-move 20s linear infinite;
+  }
+
   /* ========== 聚光灯光晕 ========== */
   .spotlight-card {
     --x: 50%;

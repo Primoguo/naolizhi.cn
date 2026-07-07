@@ -9,8 +9,8 @@ const HIGHLIGHTS = [
       "在 Safari 里看到好文章？通过分享扩展直接发送到挠荔枝，自动提取正文内容并开始朗读。无需复制粘贴，一键搞定。",
     image: (
       <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-blue-950/80 via-slate-900/90 to-cyan-950/80 border border-blue-500/20 flex items-center justify-center overflow-hidden relative group">
-        {/* 网格背景 */}
-        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        {/* 网格背景 - 添加移动动画 */}
+        <div className="absolute inset-0 opacity-[0.04] animate-grid-move" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         {/* 多层光晕 */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(59,130,246,0.25),transparent_55%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_80%,rgba(6,182,212,0.18),transparent_50%)]" />
@@ -36,10 +36,10 @@ const HIGHLIGHTS = [
               </div>
             </div>
             <div className="p-4 space-y-2.5">
-              <div className="h-2.5 w-3/4 rounded-full bg-blue-400/20" />
-              <div className="h-2 w-full rounded-full bg-white/[0.06]" />
-              <div className="h-2 w-5/6 rounded-full bg-white/[0.06]" />
-              <div className="h-2 w-2/3 rounded-full bg-white/[0.06]" />
+              <div className="h-2.5 w-3/4 rounded-full bg-blue-400/20 animate-fade-in-up" style={{ animationDelay: '0.1s' }} />
+              <div className="h-2 w-full rounded-full bg-white/[0.06] animate-fade-in-up" style={{ animationDelay: '0.2s' }} />
+              <div className="h-2 w-5/6 rounded-full bg-white/[0.06] animate-fade-in-up" style={{ animationDelay: '0.3s' }} />
+              <div className="h-2 w-2/3 rounded-full bg-white/[0.06] animate-fade-in-up" style={{ animationDelay: '0.4s' }} />
             </div>
           </div>
           
@@ -49,26 +49,26 @@ const HIGHLIGHTS = [
               <div className="w-10 h-10 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
                 <Share2 className="w-4 h-4 text-blue-400" />
               </div>
-              <div className="w-8 h-px bg-gradient-to-r from-blue-500/40 to-blue-500/10" />
-              <div className="w-2 h-2 rounded-full bg-blue-400/50" />
-              <div className="w-8 h-px bg-gradient-to-r from-blue-500/10 to-primary/40" />
+              <div className="w-8 h-px bg-gradient-to-r from-blue-500/40 to-blue-500/10 animate-flow-pulse" style={{ animationDelay: '0s' }} />
+              <div className="w-2 h-2 rounded-full bg-blue-400/50 animate-flow-pulse" style={{ animationDelay: '0.2s' }} />
+              <div className="w-8 h-px bg-gradient-to-r from-blue-500/10 to-primary/40 animate-flow-pulse" style={{ animationDelay: '0.4s' }} />
               <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
                 <FileText className="w-4 h-4 text-primary" />
               </div>
-              <div className="w-8 h-px bg-gradient-to-r from-primary/40 to-primary/10" />
-              <div className="w-2 h-2 rounded-full bg-primary/50" />
-              <div className="w-8 h-px bg-gradient-to-r from-primary/10 to-green-500/40" />
+              <div className="w-8 h-px bg-gradient-to-r from-primary/40 to-primary/10 animate-flow-pulse" style={{ animationDelay: '0.6s' }} />
+              <div className="w-2 h-2 rounded-full bg-primary/50 animate-flow-pulse" style={{ animationDelay: '0.8s' }} />
+              <div className="w-8 h-px bg-gradient-to-r from-primary/10 to-green-500/40 animate-flow-pulse" style={{ animationDelay: '1s' }} />
               <div className="w-10 h-10 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
                 <Play className="w-4 h-4 text-green-400" fill="currentColor" />
               </div>
             </div>
           </div>
           
-          {/* 底部状态标签 */}
+          {/* 底部状态标签 - 添加呼吸灯效果 */}
           <div className="flex items-center justify-center gap-3">
-            <span className="px-3 py-1.5 rounded-lg bg-blue-500/15 border border-blue-500/25 text-xs font-medium text-blue-300">Safari 分享</span>
-            <span className="px-3 py-1.5 rounded-lg bg-primary/15 border border-primary/25 text-xs font-medium text-primary">自动提取</span>
-            <span className="px-3 py-1.5 rounded-lg bg-green-500/15 border border-green-500/25 text-xs font-medium text-green-300">即时朗读</span>
+            <span className="px-3 py-1.5 rounded-lg bg-blue-500/15 border border-blue-500/25 text-xs font-medium text-blue-300 animate-glow-pulse" style={{ animationDelay: '0s' }}>Safari 分享</span>
+            <span className="px-3 py-1.5 rounded-lg bg-primary/15 border border-primary/25 text-xs font-medium text-primary animate-glow-pulse" style={{ animationDelay: '1s' }}>自动提取</span>
+            <span className="px-3 py-1.5 rounded-lg bg-green-500/15 border border-green-500/25 text-xs font-medium text-green-300 animate-glow-pulse" style={{ animationDelay: '2s' }}>即时朗读</span>
           </div>
         </div>
       </div>
