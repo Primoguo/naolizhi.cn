@@ -1,5 +1,7 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { FileText, Mic, Settings } from "lucide-react";
+import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+import { useSpotlight } from "@/hooks/use-spotlight";
 
 const FEATURES = [
   {
@@ -28,12 +30,45 @@ const FEATURES = [
   },
 ];
 
+// 单个卡片组件（内置聚光灯效果）
+function FeatureCard({ feature }: { feature: typeof FEATURES[number] }) {
+  const { spotRef, onMouseMove } = useSpotlight();
+
+  return (
+    <div
+      ref={spotRef}
+      onMouseMove={onMouseMove}
+      className="spotlight-card group relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-white/20 transition-all duration-500 hover:-translate-y-1 overflow-hidden"
+    >
+      {/* 聚光灯光晕层 */}
+      <div className="spotlight-glow pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <CardContent className="relative p-8">
+        {/* Icon */}
+        <div
+          className={`w-14 h-14 rounded-2xl ${feature.bgColor} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
+        >
+          <feature.icon
+            className={`h-7 w-7 text-transparent bg-gradient-to-br ${feature.color} bg-clip-text`}
+            strokeWidth={1.5}
+          />
+        </div>
+
+        <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+        <p className="text-white/70 leading-relaxed">{feature.description}</p>
+      </CardContent>
+    </div>
+  );
+}
+
 export default function Features() {
+  const headerRef = useScrollReveal<HTMLDivElement>();
+  const cardsRef = useScrollReveal<HTMLDivElement>();
+
   return (
     <section id="features" className="py-24 sm:py-32 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <div ref={headerRef} className="reveal text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
             一个 App，搞定所有
             <span className="text-primary">阅读</span>
@@ -44,31 +79,9 @@ export default function Features() {
         </div>
 
         {/* Cards */}
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+        <div ref={cardsRef} className="reveal-stagger grid md:grid-cols-3 gap-6 lg:gap-8">
           {FEATURES.map((feature) => (
-            <Card
-              key={feature.title}
-              className="group relative border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-white/20 transition-all duration-500 hover:-translate-y-1"
-            >
-              <CardContent className="p-8">
-                {/* Icon */}
-                <div
-              className={`w-14 h-14 rounded-2xl ${feature.bgColor} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
-            >
-              <feature.icon
-                className={`h-7 w-7 text-transparent bg-gradient-to-br ${feature.color} bg-clip-text`}
-                strokeWidth={1.5}
-              />
-                </div>
-
-                <h3 className="text-xl font-bold text-white mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-white/70 leading-relaxed">
-                  {feature.description}
-                </p>
-              </CardContent>
-            </Card>
+            <FeatureCard key={feature.title} feature={feature} />
           ))}
         </div>
       </div>

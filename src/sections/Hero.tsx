@@ -1,8 +1,30 @@
+import { useState, useCallback } from "react";
 import { ArrowDown, Star } from "lucide-react";
 
 export default function Hero() {
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const onMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    // 将鼠标位置转换为 -1 ~ 1 的范围
+    const nx = (e.clientX - cx) / (rect.width / 2);
+    const ny = (e.clientY - cy) / (rect.height / 2);
+    // 最大倾斜角度 16 度，空间感更强烈
+    setTilt({ x: ny * -16, y: nx * 16 });
+  }, []);
+
+  const onMouseLeave = useCallback(() => {
+    setTilt({ x: 0, y: 0 });
+  }, []);
+
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
+    <section
+      className="relative min-h-screen flex items-center overflow-hidden"
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20 w-full">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left: Text */}
@@ -47,7 +69,13 @@ export default function Hero() {
 
           {/* Right: Device mockup */}
           <div className="relative flex justify-center lg:justify-end">
-            <div className="relative">
+            <div
+              className="relative transition-transform duration-400 ease-out"
+              style={{
+                perspective: "700px",
+                transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+              }}
+            >
               {/* Glow behind phone */}
               <div className="absolute inset-0 rounded-[3rem] bg-primary/20 blur-[60px] scale-90" />
               {/* Phone frame */}

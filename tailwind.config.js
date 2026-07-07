@@ -75,11 +75,16 @@ module.exports = {
           "0%,70%,100%": { opacity: "1" },
           "20%,50%": { opacity: "0" },
         },
+        "wave": {
+          "0%, 100%": { height: "4px" },
+          "50%": { height: "28px" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "caret-blink": "caret-blink 1.25s ease-out infinite",
+        "wave": "wave 0.4s ease-in-out infinite alternate",
       },
     },
   },

@@ -105,12 +105,25 @@ const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 export default function EarParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isVisibleRef = useRef(true); // 用于在动画循环中判断是否可见
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d", { alpha: false });
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
+
+    // IntersectionObserver：canvas 不可见时暂停动画，节省 CPU/GPU
+    let intersectionObserver: IntersectionObserver | undefined;
+    if (typeof IntersectionObserver !== "undefined") {
+      intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          isVisibleRef.current = entries[0].isIntersecting;
+        },
+        { threshold: 0.01 }
+      );
+      intersectionObserver.observe(canvas);
+    }
 
     let animationId = 0;
     let mouseX = -1000;
@@ -119,6 +132,12 @@ export default function EarParticles() {
     let prevMouseY = -1000;
     let time = 0;
     let nextMeteorAt = randInt(METEOR_MIN_INTERVAL, METEOR_MAX_INTERVAL);
+
+    // 鼠标柔光跟随（lerp 插值，模拟流体延迟感）
+    let glowX = -1000;
+    let glowY = -1000;
+    const GLOW_LERP = 0.08; // 跟随速度，越小延迟越大
+    const GLOW_RADIUS = 120; // 光晕半径
 
     // ========== Resize ==========
     const resize = () => {
@@ -336,21 +355,53 @@ export default function EarParticles() {
     const drawMouseTrails = () => {
       for (const t of mouseTrails) {
         if (t.alpha < 0.01) continue;
+        // 光晕半径随透明度缩小，产生收束感
+        const glowRadius = 18 * t.alpha + 4;
+        const grad = ctx.createRadialGradient(t.x, t.y, 0, t.x, t.y, glowRadius);
+        grad.addColorStop(0, `rgba(212,75,61,${t.alpha * 0.6})`);   // 中心亮红
+        grad.addColorStop(0.4, `rgba(212,75,61,${t.alpha * 0.2})`); // 中间衰减
+        grad.addColorStop(1, `rgba(212,75,61,0)`);                   // 边缘透明
+        ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.arc(t.x, t.y, 2, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,200,150,${t.alpha})`;
+        ctx.arc(t.x, t.y, glowRadius, 0, Math.PI * 2);
         ctx.fill();
       }
     };
 
+    // 鼠标柔光大光晕（始终跟随鼠标，有延迟）
+    const drawCursorGlow = () => {
+      // lerp 插值：光晕缓慢追向鼠标，产生流体延迟感
+      glowX += (mouseX - glowX) * GLOW_LERP;
+      glowY += (mouseY - glowY) * GLOW_LERP;
+
+      // 鼠标不在视口内时不绘制
+      if (glowX < -200 || glowY < -200) return;
+
+      const grad = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, GLOW_RADIUS);
+      grad.addColorStop(0, "rgba(212,75,61,0.12)");    // 中心微亮
+      grad.addColorStop(0.5, "rgba(212,75,61,0.04)");  // 中间淡出
+      grad.addColorStop(1, "rgba(212,75,61,0)");         // 边缘完全透明
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(glowX, glowY, GLOW_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
     // ========== 动画循环 ==========
     const animate = () => {
+      // 不可见时跳过绘制，但继续调度下一帧以保持响应
+      if (!isVisibleRef.current) {
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
+
       const w = window.innerWidth;
       const h = window.innerHeight;
       time++;
 
-      // 全屏纯黑填充（不留拖尾）
-      ctx.fillStyle = "#050508";
+      // 透明清除 + 半透明暗色覆盖（让底层流体透出来）
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "rgba(5,5,8,0.65)";
       ctx.fillRect(0, 0, w, h);
 
       // 宇宙底色
@@ -479,6 +530,9 @@ export default function EarParticles() {
       // 4. 鼠标光迹
       drawMouseTrails();
 
+      // 5. 鼠标柔光大光晕（顶层，在星空之上）
+      drawCursorGlow();
+
       animationId = requestAnimationFrame(animate);
     };
 
@@ -487,6 +541,7 @@ export default function EarParticles() {
 
     return () => {
       cancelAnimationFrame(animationId);
+      intersectionObserver?.disconnect();
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("touchmove", handleTouchMove);
@@ -497,8 +552,8 @@ export default function EarParticles() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 z-0 pointer-events-none"
-      style={{ background: "#050508" }}
+      className="fixed inset-0 z-[1] pointer-events-none"
+      style={{ background: "transparent" }}
     />
   );
 }

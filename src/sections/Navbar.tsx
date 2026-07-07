@@ -1,11 +1,29 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMagnetic } from "@/hooks/use-magnetic";
 
 const NAV_LINKS = [
   { label: "功能", href: "#features" },
   { label: "下载", href: "#download" },
 ];
+
+function MagneticDownloadBtn() {
+  const { magRef, onMouseMove, onMouseLeave } = useMagnetic(0.25);
+  return (
+    <a
+      ref={magRef}
+      href="#download"
+      className="inline-flex transition-transform duration-200 ease-out"
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+    >
+      <Button className="rounded-full bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25 transition-all hover:shadow-primary/40">
+        免费下载
+      </Button>
+    </a>
+  );
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -50,14 +68,7 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
-            <a
-              href="#download"
-              className="inline-flex"
-            >
-              <Button className="rounded-full bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25 transition-all hover:shadow-primary/40 hover:-translate-y-0.5">
-                免费下载
-              </Button>
-            </a>
+            <MagneticDownloadBtn />
           </div>
 
           {/* Mobile toggle */}
@@ -72,30 +83,34 @@ export default function Navbar() {
       </div>
 
       {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden bg-white dark:bg-black border-t border-border">
-          <div className="px-4 py-4 space-y-3">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="block text-sm font-medium text-muted-foreground hover:text-foreground py-2"
-              >
-                {link.label}
-              </a>
-            ))}
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          mobileOpen
+            ? "max-h-64 opacity-100"
+            : "max-h-0 opacity-0"
+        } bg-black/90 backdrop-blur-xl border-t border-white/10`}
+      >
+        <div className="px-4 py-4 space-y-3">
+          {NAV_LINKS.map((link) => (
             <a
-              href="#download"
+              key={link.href}
+              href={link.href}
               onClick={() => setMobileOpen(false)}
+              className="block text-sm font-medium text-muted-foreground hover:text-foreground py-2"
             >
-              <Button className="w-full rounded-full bg-primary hover:bg-primary/90 text-white">
-                免费下载
-              </Button>
+              {link.label}
             </a>
-          </div>
+          ))}
+          <a
+            href="#download"
+            onClick={() => setMobileOpen(false)}
+          >
+            <Button className="w-full rounded-full bg-primary hover:bg-primary/90 text-white">
+              免费下载
+            </Button>
+          </a>
         </div>
-      )}
+      </div>
     </nav>
   );
 }

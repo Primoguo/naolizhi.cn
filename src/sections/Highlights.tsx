@@ -1,4 +1,5 @@
 import { Globe, Headphones, Moon } from "lucide-react";
+import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
 const HIGHLIGHTS = [
   {
@@ -69,10 +70,12 @@ const HIGHLIGHTS = [
 ];
 
 export default function Highlights() {
+  const headerRef = useScrollReveal<HTMLDivElement>();
+
   return (
     <section className="py-24 sm:py-32 bg-white/[0.03] backdrop-blur-sm border-y border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <div ref={headerRef} className="reveal text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
             不止于<span className="text-primary">朗读</span>
           </h2>

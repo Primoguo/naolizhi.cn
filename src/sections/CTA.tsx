@@ -1,10 +1,15 @@
 import { ArrowUpRight } from "lucide-react";
+import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+import { useMagnetic } from "@/hooks/use-magnetic";
 
 export default function CTA() {
+  const ctaRef = useScrollReveal<HTMLDivElement>();
+  const { magRef, onMouseMove, onMouseLeave } = useMagnetic(0.2);
+
   return (
     <section id="download" className="py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl bg-gradient-to-br from-primary to-red-600 overflow-hidden">
+        <div ref={ctaRef} className="reveal relative rounded-3xl bg-gradient-to-br from-primary to-red-600 overflow-hidden">
           {/* Decorative */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/10 blur-[80px]" />
@@ -21,10 +26,13 @@ export default function CTA() {
 
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
+                ref={magRef}
                 href="https://apps.apple.com/app/id6742556743"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex rounded-xl bg-white shadow-xl shadow-black/20 hover:shadow-black/30 transition-all hover:-translate-y-0.5"
+                onMouseMove={onMouseMove}
+                onMouseLeave={onMouseLeave}
+                className="inline-flex rounded-xl bg-white shadow-xl shadow-black/20 hover:shadow-black/30 transition-transform duration-200 ease-out"
               >
                 <img
                   src="/app-store-badge-white.svg"
