@@ -1,0 +1,14 @@
+schema_version: 1
+module_path: configuration_system
+title: 前端工程化配置体系（Vite + Tailwind + shadcn/ui）
+scope: []
+source_files:
+    - vite.config.ts
+    - tailwind.config.js
+    - postcss.config.js
+    - components.json
+    - package.json
+    - tsconfig.json
+    - eslint.config.js
+depends_on: []
+related_to: []

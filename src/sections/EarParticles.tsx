@@ -52,8 +52,8 @@ const isMobile = () =>
   typeof window !== "undefined" && window.innerWidth < 768;
 
 const getParticleCounts = () => {
-  if (isMobile()) return { stars: 120, dust: 150 };
-  return { stars: 400, dust: 300 };
+  if (isMobile()) return { stars: 180, dust: 200 }; // 移动端也增加密度
+  return { stars: 600, dust: 450 }; // 桌面端大幅增加
 };
 
 const STAR_COUNT = () => getParticleCounts().stars;
@@ -61,8 +61,8 @@ const DUST_COUNT = () => getParticleCounts().dust;
 const TRAIL_LENGTH = 16;
 const MOUSE_TRAIL_MAX = 8;
 const MOUSE_INFLUENCE = 120;
-const METEOR_MIN_INTERVAL = 240; // 帧
-const METEOR_MAX_INTERVAL = 480;
+const METEOR_MIN_INTERVAL = 120; // 帧（流星间隔缩短，频率提高一倍）
+const METEOR_MAX_INTERVAL = 280;
 
 // 预计算颜色
 const STAR_COLORS: { color: string; crossColor: string }[] = [
@@ -156,13 +156,13 @@ export default function EarParticles() {
       return {
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
-        size: rand(0.3, 2.5),
+        size: rand(0.2, 2.8),       // 尺寸范围稍大，有更多大小变化
         alpha: 0,
-        baseAlpha: rand(0.3, 1.0),
-        twinkleSpeed: rand(0.02, 0.08),
+        baseAlpha: rand(0.25, 1.0), // 基础亮度下限降低，更多暗星
+        twinkleSpeed: rand(0.015, 0.1), // 闪烁速度范围更大
         twinklePhase: Math.random() * Math.PI * 2,
         color: colorData.color,
-        hasCross: Math.random() < 0.1,
+        hasCross: Math.random() < 0.12,   // 十字星芒概率稍增
         crossColor: colorData.crossColor,
       };
     };
@@ -171,13 +171,13 @@ export default function EarParticles() {
       return {
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        size: rand(0.3, 1.0),
+        vx: (Math.random() - 0.5) * 0.35, // 漂移速度稍快
+        vy: (Math.random() - 0.5) * 0.35,
+        size: rand(0.2, 1.2),             // 光粒尺寸范围更大
         alpha: 0,
-        baseAlpha: rand(0.2, 0.6),
-        life: randInt(200, 600),
-        maxLife: randInt(400, 800),
+        baseAlpha: rand(0.15, 0.7),       // 亮度更低，更柔和
+        life: randInt(180, 550),          // 寿命稍短，更新更快
+        maxLife: randInt(350, 750),
         color: pick(DUST_COLORS),
       };
     };

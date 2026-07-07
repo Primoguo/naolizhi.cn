@@ -1,0 +1,8 @@
+schema_version: 1
+module_path: ""
+title: 挠荔枝 Knowledge 官网根工程（Vite + React 19 单页应用）
+scope:
+    - '**'
+source_files: []
+depends_on: []
+related_to: []
