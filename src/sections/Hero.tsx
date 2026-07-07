@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef } from "react";
 import { ArrowDown, Star } from "lucide-react";
-import { useTypewriter } from "@/hooks/use-typewriter";
 
 // 磁吸效果 Hook
 function useMagnetic(magneticStrength = 0.3) {
@@ -42,11 +41,6 @@ function useMagnetic(magneticStrength = 0.3) {
 
 export default function Hero() {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-
-  // 手机屏幕中的动态文本 - 来自 Knowledge PRD 功能介绍
-  const prdText = `挠荔枝是一款专为深度阅读设计的 iOS 有声阅读器。支持 PDF、EPUB、Word 等 9 种格式一键导入，18 种语言智能朗读，后台播放、锁屏控制、智能高亮跟随——让文档像音乐一样被聆听。`;
-  
-  const { displayedText } = useTypewriter(prdText, 25, 1500);
 
   const onMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -189,14 +183,24 @@ export default function Hero() {
                       </div>
                     </div>
 
-                    {/* 高亮文本区域 - 动态打字机效果 */}
+                    {/* 高亮文本区域 */}
                     <div className="flex-1 mx-4 rounded-xl bg-white/[0.04] overflow-hidden px-4 py-3">
                       <div className="space-y-2.5">
-                        <p className="text-[10px] text-white/60 leading-relaxed font-serif min-h-[60px]">
-                          {displayedText}
-                          {!displayedText && (
-                            <span className="inline-block w-1 h-3 ml-0.5 bg-blue-400 animate-pulse" />
-                          )}
+                        <p className="text-[10px] text-white/50 leading-relaxed font-serif">
+                          所谓厉害的人，就是每天比你多清醒一点点的人。很多时候，我们并非不够努力，而是缺乏对自己行为和思维的觉察。
+                        </p>
+                        <p className="text-[10px] leading-relaxed font-serif">
+                          <span className="text-white/50">当你开始</span>
+                          <span className="text-blue-400 font-bold bg-blue-400/15 px-0.5 rounded">观察自己的注意力</span>
+                          <span className="text-blue-400 font-bold bg-blue-400/15 px-0.5 rounded">去了哪里，时间都花</span>
+                          <span className="text-blue-400 font-bold bg-blue-400/15 px-0.5 rounded">在了什么地方，</span>
+                          <span className="text-white/50">你就已经走在了觉醒的路上。</span>
+                        </p>
+                        <p className="text-[10px] text-white/50 leading-relaxed font-serif">
+                          人与人之间最大的差距，不是智商，不是学历，而是认知觉醒的程度。一个人只有在认知觉醒之后，才能真正掌控自己的人生方向。
+                        </p>
+                        <p className="text-[10px] text-white/35 leading-relaxed font-serif">
+                          而觉醒的第一步，就是意识到自己正处于「无意识」的状态中……
                         </p>
                       </div>
                     </div>
