@@ -113,9 +113,9 @@ export default function Hero() {
                 {/* 钛金属边框（多层渐变模拟立体感）*/}
                 <div className="absolute inset-0 rounded-[3.5rem] bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 shadow-2xl">
                   {/* 左侧高光边框 */}
-                  <div className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-[3.5rem] bg-gradient-to-b from-white/60 via-white/30 to-transparent" />
+                  <div className="absolute left-0 top-[3.5rem] bottom-[3.5rem] w-[3px] bg-gradient-to-b from-white/60 via-white/30 to-transparent" />
                   {/* 右侧阴影边框 */}
-                  <div className="absolute right-0 top-0 bottom-0 w-[3px] rounded-r-[3.5rem] bg-gradient-to-b from-black/30 via-black/15 to-transparent" />
+                  <div className="absolute right-0 top-[3.5rem] bottom-[3.5rem] w-[3px] bg-gradient-to-b from-black/30 via-black/15 to-transparent" />
                   {/* 顶部高光 */}
                   <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-[3.5rem] bg-gradient-to-r from-white/40 via-white/20 to-transparent" />
                   {/* 底部阴影 */}
