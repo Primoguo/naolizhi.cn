@@ -7,18 +7,18 @@ export default function CTA() {
   const { magRef, onMouseMove, onMouseLeave } = useMagnetic(0.2);
 
   return (
-    <section id="download" className="py-24 sm:py-32 relative bg-[radial-gradient(ellipse_at_center,rgba(251,146,60,0.08),transparent_70%)]">
+    <section id="download" className="py-24 sm:py-32 relative bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.08),transparent_70%)]">
       {/* 背景光晕 */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-red-500/10 rounded-full blur-[120px]" />
-        <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] bg-orange-400/8 rounded-full blur-[80px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-violet-500/10 rounded-full blur-[120px]" />
+        <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] bg-blue-400/8 rounded-full blur-[80px]" />
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div ref={ctaRef} className="reveal relative rounded-3xl bg-gradient-to-br from-red-500 via-orange-500 to-amber-500 overflow-hidden shadow-2xl shadow-orange-500/20">
+        <div ref={ctaRef} className="reveal relative rounded-3xl bg-gradient-to-br from-blue-600 via-violet-500 to-purple-500 overflow-hidden shadow-2xl shadow-violet-500/20">
           {/* Decorative */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/10 blur-[80px]" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-amber-300/15 blur-[80px]" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-violet-300/15 blur-[80px]" />
             <div className="absolute bottom-0 right-0 w-48 h-48 rounded-full bg-white/8 blur-[60px]" />
           </div>
 
