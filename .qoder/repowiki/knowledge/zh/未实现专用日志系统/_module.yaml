@@ -1,0 +1,7 @@
+schema_version: 1
+module_path: logging_system
+title: 未实现专用日志系统
+scope: []
+source_files: []
+depends_on: []
+related_to: []

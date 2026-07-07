@@ -3,19 +3,31 @@ schema_version: 1
 locale: zh-CN
 branch: main
 nodes_managed: true
-exported_at: "2026-07-07T15:12:36Z"
+exported_at: "2026-07-07T15:43:40Z"
 modules:
     "":
-        dir_name: 挠荔枝 Knowledge 官网根工程（Vite + React 19 单页应用）
-        title: 挠荔枝 Knowledge 官网根工程（Vite + React 19 单页应用）
+        dir_name: 挠荔枝 Knowledge 官网项目根配置
+        title: 挠荔枝 Knowledge 官网项目根配置
         scope:
-            - '**'
+            - README.md
+            - .gitignore
+            - index.html
+            - package.json
+            - package-lock.json
+            - components.json
+            - eslint.config.js
+            - postcss.config.js
+            - tailwind.config.js
+            - tsconfig.json
+            - tsconfig.app.json
+            - tsconfig.node.json
+            - vite.config.ts
         source_files: []
         children: []
         depends_on: []
         related_to: []
     build_system:
-        dir_name: Vite + TypeScript 前端构建体系
+        dir_name: Vite + TypeScript 前端构建体系_2
         title: Vite + TypeScript 前端构建体系
         scope: []
         source_files:
@@ -38,10 +50,10 @@ modules:
             - vite.config.ts
             - tailwind.config.js
             - postcss.config.js
-            - src/index.css
             - components.json
-            - tsconfig.json
             - package.json
+            - tsconfig.json
+            - eslint.config.js
         children: []
         depends_on: []
         related_to: []
@@ -52,30 +64,39 @@ modules:
         source_files:
             - package.json
             - package-lock.json
-            - .gitignore
         children: []
         depends_on: []
         related_to: []
     error_handling:
-        dir_name: 前端错误处理：基于浏览器 API 回调的轻量策略
+        dir_name: 前端错误处理：基于浏览器 API 回调的轻量策略_2
         title: 前端错误处理：基于浏览器 API 回调的轻量策略
         scope: []
         source_files:
             - src/sections/TTSDemo.tsx
+            - src/main.tsx
+            - src/App.tsx
         children: []
         depends_on: []
         related_to: []
     frontend_style:
-        dir_name: 基于 Tailwind + shadcn_ui 的原子化样式体系
+        dir_name: 基于 Tailwind + shadcn_ui 的原子化样式体系_2
         title: 基于 Tailwind + shadcn/ui 的原子化样式体系
         scope: []
         source_files:
             - tailwind.config.js
-            - postcss.config.js
             - src/index.css
-            - src/App.css
+            - postcss.config.js
             - components.json
+            - src/App.css
             - src/components/ui/button.tsx
+        children: []
+        depends_on: []
+        related_to: []
+    logging_system:
+        dir_name: 未实现专用日志系统
+        title: 未实现专用日志系统
+        scope: []
+        source_files: []
         children: []
         depends_on: []
         related_to: []

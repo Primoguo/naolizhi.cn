@@ -6,9 +6,9 @@ source_files:
     - vite.config.ts
     - tailwind.config.js
     - postcss.config.js
+    - src/index.css
     - components.json
-    - package.json
     - tsconfig.json
-    - eslint.config.js
+    - package.json
 depends_on: []
 related_to: []

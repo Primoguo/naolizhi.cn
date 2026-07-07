@@ -12,6 +12,13 @@
 - [tailwind.config.js](file://tailwind.config.js)
 </cite>
 
+## 更新摘要
+**变更内容**   
+- 新增两大AI功能卡片：AI总结（紫色芯片图标）和AI伴读（青色对话气泡图标）
+- 网格布局从三列扩展到五列，支持更多特性展示
+- 增强背景色映射系统，支持新的紫色和青色主题
+- 优化图标设计，采用更直观的AI相关视觉元素
+
 ## 目录
 1. [简介](#简介)
 2. [项目结构](#项目结构)
@@ -25,7 +32,7 @@
 10. [附录：扩展与自定义样式](#附录扩展与自定义样式)
 
 ## 简介
-本文件为“特性展示”（Features）组件的完整技术文档。该组件以数据驱动的方式渲染一组功能卡片，结合滚动入场动画、鼠标跟随聚光灯效果与响应式网格布局，提供流畅且可访问的用户体验。文档覆盖设计模式、实现细节、Props接口、状态管理、动画机制、无障碍支持、扩展方法与性能优化策略。
+本文件为"特性展示"（Features）组件的完整技术文档。该组件以数据驱动的方式渲染一组功能卡片，结合滚动入场动画、鼠标跟随聚光灯效果与响应式网格布局，提供流畅且可访问的用户体验。**最新更新**：组件现已支持五大核心功能展示，包括新增的AI智能功能，通过增强的网格布局系统实现更丰富的信息呈现。
 
 ## 项目结构
 Features组件位于页面区块模块中，使用UI层卡片组件与多个自定义Hooks组合完成交互与动效；样式通过Tailwind与全局CSS变量协同控制。
@@ -57,8 +64,8 @@ F --> CSS
 F --> TW
 ```
 
-图表来源
-- [src/sections/Features.tsx:1-127](file://src/sections/Features.tsx#L1-L127)
+**图表来源**
+- [src/sections/Features.tsx:1-169](file://src/sections/Features.tsx#L1-L169)
 - [src/components/ui/card.tsx:1-93](file://src/components/ui/card.tsx#L1-L93)
 - [src/hooks/use-scroll-reveal.ts:1-34](file://src/hooks/use-scroll-reveal.ts#L1-L34)
 - [src/hooks/use-spotlight.ts:1-21](file://src/hooks/use-spotlight.ts#L1-L21)
@@ -67,8 +74,8 @@ F --> TW
 - [src/index.css:80-116](file://src/index.css#L80-L116)
 - [tailwind.config.js:1-92](file://tailwind.config.js#L1-L92)
 
-章节来源
-- [src/sections/Features.tsx:1-127](file://src/sections/Features.tsx#L1-L127)
+**章节来源**
+- [src/sections/Features.tsx:1-169](file://src/sections/Features.tsx#L1-L169)
 - [src/components/ui/card.tsx:1-93](file://src/components/ui/card.tsx#L1-L93)
 - [src/hooks/use-scroll-reveal.ts:1-34](file://src/hooks/use-scroll-reveal.ts#L1-L34)
 - [src/hooks/use-spotlight.ts:1-21](file://src/hooks/use-spotlight.ts#L1-L21)
@@ -78,25 +85,27 @@ F --> TW
 - [tailwind.config.js:1-92](file://tailwind.config.js#L1-L92)
 
 ## 核心组件与数据模型
-- 数据源：组件内定义的特性数组，包含标题、描述、图标类名与SVG图标节点。
-- 卡片容器：外层div负责聚光灯光晕与悬停过渡，内部使用CardContent承载内容。
-- 滚动入场：使用IntersectionObserver在元素进入视口时添加revealed类，触发CSS过渡。
-- 聚光灯效果：通过更新CSS变量--x/--y，配合radial-gradient实现跟随光标的光晕。
-- 响应式网格：基于Tailwind的grid-cols在不同断点切换列数，形成自适应布局。
+- **数据源**：组件内定义的五项特性数组，包含标题、描述、图标类名与SVG图标节点，涵盖基础功能与AI智能功能
+- **卡片容器**：外层div负责聚光灯光晕与悬停过渡，内部使用CardContent承载内容
+- **滚动入场**：使用IntersectionObserver在元素进入视口时添加revealed类，触发CSS过渡
+- **聚光灯效果**：通过更新CSS变量--x/--y，配合radial-gradient实现跟随光标的光晕
+- **响应式网格**：基于Tailwind的grid-cols在不同断点切换列数，形成自适应布局
 
-章节来源
-- [src/sections/Features.tsx:5-97](file://src/sections/Features.tsx#L5-L97)
+**更新**：数据模型现已扩展至五个特性，新增AI总结与AI伴读功能，采用独特的视觉标识系统
+
+**章节来源**
+- [src/sections/Features.tsx:5-100](file://src/sections/Features.tsx#L5-L100)
 - [src/components/ui/card.tsx:64-72](file://src/components/ui/card.tsx#L64-L72)
 - [src/hooks/use-scroll-reveal.ts:1-34](file://src/hooks/use-scroll-reveal.ts#L1-L34)
 - [src/hooks/use-spotlight.ts:1-21](file://src/hooks/use-spotlight.ts#L1-L21)
 - [src/index.css:80-116](file://src/index.css#L80-L116)
 
 ## 架构总览
-Features组件采用“数据驱动 + Hooks组合”的轻量架构：
-- 数据层：常量数组作为唯一数据源，便于维护与扩展。
-- 视图层：React函数组件负责渲染，将数据映射到卡片列表。
-- 交互层：useSpotlight处理鼠标移动事件并更新CSS变量；useScrollReveal监听滚动进入视口并注入动画类。
-- 样式层：Tailwind原子类与全局CSS变量共同控制主题、间距、圆角、阴影与动画曲线。
+Features组件采用"数据驱动 + Hooks组合"的轻量架构：
+- **数据层**：常量数组作为唯一数据源，便于维护与扩展，现支持五种不同特性的展示
+- **视图层**：React函数组件负责渲染，将数据映射到卡片列表
+- **交互层**：useSpotlight处理鼠标移动事件并更新CSS变量；useScrollReveal监听滚动进入视口并注入动画类
+- **样式层**：Tailwind原子类与全局CSS变量共同控制主题、间距、圆角、阴影与动画曲线
 
 ```mermaid
 sequenceDiagram
@@ -116,8 +125,8 @@ Spotlight->>DOM : 设置 --x / --y 变量
 DOM-->>Card : radial-gradient 光晕跟随
 ```
 
-图表来源
-- [src/sections/Features.tsx:99-126](file://src/sections/Features.tsx#L99-L126)
+**图表来源**
+- [src/sections/Features.tsx:141-168](file://src/sections/Features.tsx#L141-L168)
 - [src/hooks/use-spotlight.ts:8-20](file://src/hooks/use-spotlight.ts#L8-L20)
 - [src/hooks/use-scroll-reveal.ts:7-33](file://src/hooks/use-scroll-reveal.ts#L7-L33)
 - [src/index.css:80-116](file://src/index.css#L80-L116)
@@ -125,59 +134,65 @@ DOM-->>Card : radial-gradient 光晕跟随
 ## 详细组件分析
 
 ### 数据驱动渲染与Props接口
-- 数据模型字段
+- **数据模型字段**
   - title: 卡片标题文本
-  - description: 卡片描述文本
-  - iconClass: 图标颜色类名（如 amber/red/green）
+  - description: 卡片描述文本  
+  - iconClass: 图标颜色类名（如 amber/red/green/purple/cyan）
   - icon: 图标JSX（SVG节点）
-- 渲染方式
+- **渲染方式**
   - 遍历数据数组，为每项创建FeatureCard实例
   - 每个卡片接收feature对象作为props
-- 可扩展性
+- **可扩展性**
   - 新增特性只需在数据数组追加对象，无需修改渲染逻辑
   - 可通过扩展iconClass或新增背景色映射来支持新主题色
 
-章节来源
-- [src/sections/Features.tsx:5-60](file://src/sections/Features.tsx#L5-L60)
-- [src/sections/Features.tsx:63-97](file://src/sections/Features.tsx#L63-L97)
+**更新**：数据模型现已支持五种不同的图标主题色，包括新增的紫色和青色AI功能标识
+
+**章节来源**
+- [src/sections/Features.tsx:5-100](file://src/sections/Features.tsx#L5-L100)
+- [src/sections/Features.tsx:103-139](file://src/sections/Features.tsx#L103-L139)
 
 ### 卡片布局系统与响应式网格
-- 布局容器
-  - 使用grid布局，md断点下三列，gap统一间距
+- **布局容器**
+  - 使用grid布局，md断点下三列，lg断点下五列，gap统一间距
   - 最大宽度居中，左右留白适配不同屏幕
-- 卡片结构
+- **卡片结构**
   - 外层容器负责边框、半透明背景、模糊、悬停位移与光晕层
   - 内层CardContent承载图标、标题与描述
-- 图标区
+- **图标区**
   - 根据iconClass动态生成背景色块，悬停放大
   - 图标颜色由iconClass控制，保持视觉一致性
 
-章节来源
-- [src/sections/Features.tsx:104-122](file://src/sections/Features.tsx#L104-L122)
-- [src/sections/Features.tsx:74-96](file://src/sections/Features.tsx#L74-L96)
+**更新**：网格布局已从三列扩展至五列，更好地展示AI功能的丰富特性
+
+**章节来源**
+- [src/sections/Features.tsx:160](file://src/sections/Features.tsx#L160)
+- [src/sections/Features.tsx:116-139](file://src/sections/Features.tsx#L116-L139)
 - [src/components/ui/card.tsx:64-72](file://src/components/ui/card.tsx#L64-L72)
 
 ### 图标集成方案
-- 图标来源
+- **图标来源**
   - 直接内联SVG JSX，避免额外资源请求
-- 样式绑定
+- **样式绑定**
   - 通过iconClass传递颜色类名，统一控制图标与背景色块
-- 可替换性
+- **可替换性**
   - 可将SVG替换为外部图标库组件，保持接口不变
 
-章节来源
-- [src/sections/Features.tsx:11-59](file://src/sections/Features.tsx#L11-L59)
-- [src/sections/Features.tsx:84-90](file://src/sections/Features.tsx#L84-L90)
+**更新**：新增AI相关的专业图标设计，包括芯片图案和对话气泡，增强AI功能的视觉识别度
+
+**章节来源**
+- [src/sections/Features.tsx:11-99](file://src/sections/Features.tsx#L11-L99)
+- [src/sections/Features.tsx:126-132](file://src/sections/Features.tsx#L126-L132)
 
 ### 动画效果实现
-- 滚动入场
+- **滚动入场**
   - useScrollReveal使用IntersectionObserver监听元素进入视口
   - 进入后添加revealed类，触发CSS定义的fade-up过渡
   - 父容器使用reveal-stagger实现子项延迟入场
-- 聚光灯光晕
+- **聚光灯光晕**
   - useSpotlight在mousemove事件中计算光标相对位置，写入--x/--y
   - CSS中使用radial-gradient(circle at var(--x) var(--y), ...)绘制光晕
-- 悬停微动效
+- **悬停微动效**
   - 卡片悬停轻微上移、边框变亮、背景透明度变化
   - 图标区域悬停放大
 
@@ -192,59 +207,59 @@ Unobserve --> End(["结束"])
 Wait --> Observe
 ```
 
-图表来源
+**图表来源**
 - [src/hooks/use-scroll-reveal.ts:12-30](file://src/hooks/use-scroll-reveal.ts#L12-L30)
 - [src/index.css:80-103](file://src/index.css#L80-L103)
 
-章节来源
+**章节来源**
 - [src/hooks/use-scroll-reveal.ts:1-34](file://src/hooks/use-scroll-reveal.ts#L1-L34)
 - [src/hooks/use-spotlight.ts:1-21](file://src/hooks/use-spotlight.ts#L1-L21)
 - [src/index.css:80-116](file://src/index.css#L80-L116)
 
 ### 状态管理机制
-- 无全局状态
+- **无全局状态**
   - 所有交互状态均通过本地ref与CSS变量管理
-- 局部状态
+- **局部状态**
   - useScrollReveal返回ref，用于挂载观察者
   - useSpotlight返回ref与onMouseMove回调，更新--x/--y
-- 副作用清理
+- **副作用清理**
   - IntersectionObserver在卸载时断开，避免内存泄漏
 
-章节来源
+**章节来源**
 - [src/hooks/use-scroll-reveal.ts:12-30](file://src/hooks/use-scroll-reveal.ts#L12-L30)
 - [src/hooks/use-spotlight.ts:11-17](file://src/hooks/use-spotlight.ts#L11-L17)
 
 ### 无障碍访问支持
-- 语义化标签
+- **语义化标签**
   - 使用section、h2、p等语义标签提升可读性与可访问性
-- 焦点与键盘导航
+- **焦点与键盘导航**
   - 当前卡片为纯展示，不涉及交互焦点；如需扩展按钮或链接，建议遵循Button组件的可访问性约定
-- 对比度与可读性
+- **对比度与可读性**
   - 文本颜色与背景对比度满足基础可读性要求；深色模式下通过CSS变量调整
 
-章节来源
-- [src/sections/Features.tsx:104-115](file://src/sections/Features.tsx#L104-L115)
+**章节来源**
+- [src/sections/Features.tsx:145-167](file://src/sections/Features.tsx#L145-L167)
 - [src/components/ui/button.tsx:1-63](file://src/components/ui/button.tsx#L1-L63)
 - [src/index.css:8-68](file://src/index.css#L8-L68)
 
 ### 错误处理最佳实践
-- 空数据保护
+- **空数据保护**
   - 若数据为空，应渲染占位提示或隐藏区块
-- 观察者异常
+- **观察者异常**
   - IntersectionObserver在旧环境可能不可用，需降级处理
-- 事件安全
+- **事件安全**
   - 在onMouseMove中检查元素引用存在性，避免空指针
 
-章节来源
+**章节来源**
 - [src/hooks/use-scroll-reveal.ts:12-22](file://src/hooks/use-scroll-reveal.ts#L12-L22)
 - [src/hooks/use-spotlight.ts:11-17](file://src/hooks/use-spotlight.ts#L11-L17)
 
 ## 依赖关系分析
-- 组件依赖
+- **组件依赖**
   - Features依赖CardContent进行内容包裹
   - FeatureCard依赖useSpotlight实现光晕
   - 整体依赖useScrollReveal实现滚动入场
-- 工具与样式
+- **工具与样式**
   - cn工具函数合并类名
   - Tailwind配置提供主题色、圆角、阴影与动画
   - index.css定义入场动画与光晕渐变
@@ -254,10 +269,12 @@ classDiagram
 class Features {
 +渲染特性区块
 +使用 useScrollReveal()
++支持5个特性展示
 }
 class FeatureCard {
 +接收 feature props
 +使用 useSpotlight()
++支持多主题色
 }
 class CardContent {
 +包裹内容区域
@@ -276,68 +293,77 @@ FeatureCard --> useSpotlight : "依赖"
 Features --> useScrollReveal : "依赖"
 ```
 
-图表来源
-- [src/sections/Features.tsx:63-126](file://src/sections/Features.tsx#L63-L126)
+**图表来源**
+- [src/sections/Features.tsx:103-168](file://src/sections/Features.tsx#L103-L168)
 - [src/components/ui/card.tsx:64-72](file://src/components/ui/card.tsx#L64-L72)
 - [src/hooks/use-spotlight.ts:8-20](file://src/hooks/use-spotlight.ts#L8-L20)
 - [src/hooks/use-scroll-reveal.ts:7-33](file://src/hooks/use-scroll-reveal.ts#L7-L33)
 
-章节来源
-- [src/sections/Features.tsx:1-127](file://src/sections/Features.tsx#L1-L127)
+**章节来源**
+- [src/sections/Features.tsx:1-169](file://src/sections/Features.tsx#L1-L169)
 - [src/components/ui/card.tsx:1-93](file://src/components/ui/card.tsx#L1-L93)
 - [src/hooks/use-spotlight.ts:1-21](file://src/hooks/use-spotlight.ts#L1-L21)
 - [src/hooks/use-scroll-reveal.ts:1-34](file://src/hooks/use-scroll-reveal.ts#L1-L34)
 
 ## 性能考量
-- 减少重排重绘
+- **减少重排重绘**
   - 使用transform与opacity进行动画，避免触发布局抖动
   - 光晕通过CSS变量与渐变实现，不引入复杂JS动画循环
-- 观察者优化
+- **观察者优化**
   - IntersectionObserver只触发一次，及时unobserve释放资源
-- 事件节流
+- **事件节流**
   - 高频mousemove可考虑节流或requestAnimationFrame优化（按需）
-- 样式合并
+- **样式合并**
   - 使用cn工具函数合并类名，避免重复计算
 
-章节来源
+**章节来源**
 - [src/hooks/use-scroll-reveal.ts:12-30](file://src/hooks/use-scroll-reveal.ts#L12-L30)
 - [src/index.css:80-116](file://src/index.css#L80-L116)
 - [src/lib/utils.ts:4-6](file://src/lib/utils.ts#L4-L6)
 
 ## 故障排查指南
-- 动画未触发
+- **动画未触发**
   - 检查父容器是否应用了reveal或reveal-stagger类
   - 确认元素进入视口的阈值threshold是否合理
-- 光晕不跟随
+- **光晕不跟随**
   - 确认spotRef已绑定到卡片容器
   - 检查onMouseMove是否正确传入
   - 验证CSS变量--x/--y是否被正确设置
-- 样式冲突
+- **样式冲突**
   - 核对Tailwind类名与自定义CSS优先级
   - 确保dark模式变量生效
+- **AI功能图标显示异常**
+  - 检查purple和cyan颜色类名是否正确映射
+  - 确认新增的背景色映射逻辑正常工作
 
-章节来源
+**更新**：新增针对AI功能图标的专门排查指南
+
+**章节来源**
 - [src/hooks/use-scroll-reveal.ts:12-30](file://src/hooks/use-scroll-reveal.ts#L12-L30)
 - [src/hooks/use-spotlight.ts:11-17](file://src/hooks/use-spotlight.ts#L11-L17)
 - [src/index.css:80-116](file://src/index.css#L80-L116)
+- [src/sections/Features.tsx:107-114](file://src/sections/Features.tsx#L107-L114)
 
 ## 结论
-Features组件以简洁的数据驱动模式与Hooks组合实现了高可用、易扩展的特性展示能力。通过IntersectionObserver与CSS变量的协作，既保证了动画性能，又降低了复杂度。响应式网格与主题变量使组件在多端与多主题场景下保持一致体验。
+Features组件以简洁的数据驱动模式与Hooks组合实现了高可用、易扩展的特性展示能力。**最新升级**：通过新增AI智能功能和增强的网格布局系统，组件现在能够更有效地展示产品的智能化特性。通过IntersectionObserver与CSS变量的协作，既保证了动画性能，又降低了复杂度。响应式网格与主题变量使组件在多端与多主题场景下保持一致体验，特别是新增的五列布局为AI功能的展示提供了更好的空间利用。
 
 ## 附录：扩展与自定义样式
-- 扩展方法
+- **扩展方法**
   - 新增特性：在数据数组追加对象，保持字段一致
   - 新增图标主题：扩展getBgColor映射逻辑，增加对应背景色类
   - 替换图标：将SVG替换为图标组件，保持icon字段类型兼容
-- 自定义样式
+- **自定义样式**
   - 调整入场动画：修改index.css中的.reveal与.reveal-stagger过渡参数
   - 调整光晕半径与颜色：修改spotlight-glow的radial-gradient参数
   - 调整网格间距与列数：修改grid与gap的Tailwind类
-- 主题配置
+- **主题配置**
   - 通过tailwind.config.js扩展colors、borderRadius、boxShadow等
   - 通过index.css的CSS变量统一管理明暗主题
 
-章节来源
-- [src/sections/Features.tsx:67-72](file://src/sections/Features.tsx#L67-L72)
+**更新**：新增针对AI功能主题的扩展指南，包括紫色和青色主题色的使用方法
+
+**章节来源**
+- [src/sections/Features.tsx:107-114](file://src/sections/Features.tsx#L107-L114)
+- [src/sections/Features.tsx:160](file://src/sections/Features.tsx#L160)
 - [src/index.css:80-116](file://src/index.css#L80-L116)
 - [tailwind.config.js:1-92](file://tailwind.config.js#L1-L92)
