@@ -451,7 +451,7 @@ export default function Highlights() {
     <section className="py-24 sm:py-32 bg-[#0d1b2e]/90 backdrop-blur-sm border-y border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div ref={headerRef} className="reveal text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-sky-200">
             不止于<span className="text-primary">朗读</span>
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">

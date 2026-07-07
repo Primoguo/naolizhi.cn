@@ -117,7 +117,7 @@ function FeatureCard({ feature }: { feature: typeof FEATURES[number] }) {
     <div
       ref={spotRef}
       onMouseMove={onMouseMove}
-      className="spotlight-card group relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-white/20 transition-all duration-500 hover:-translate-y-1 overflow-hidden"
+      className="spotlight-card group relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-white/20 transition-all duration-500 hover:-translate-y-1 overflow-hidden h-full"
     >
       {/* 聚光灯光晕层 */}
       <div className="spotlight-glow pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -157,7 +157,7 @@ export default function Features() {
         </div>
 
         {/* Cards */}
-        <div ref={cardsRef} className="reveal-stagger grid md:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-8">
+        <div ref={cardsRef} className="reveal-stagger grid md:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-8 [&>*]:min-w-0">
           {FEATURES.map((feature) => (
             <FeatureCard key={feature.title} feature={feature} />
           ))}

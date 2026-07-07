@@ -7,7 +7,7 @@ export default function CTA() {
   const { magRef, onMouseMove, onMouseLeave } = useMagnetic(0.2);
 
   return (
-    <section id="download" className="py-24 sm:py-32 relative">
+    <section id="download" className="py-24 sm:py-32 relative bg-[radial-gradient(ellipse_at_center,rgba(251,146,60,0.08),transparent_70%)]">
       {/* 背景光晕 */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-red-500/10 rounded-full blur-[120px]" />
@@ -18,7 +18,8 @@ export default function CTA() {
           {/* Decorative */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/10 blur-[80px]" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-black/10 blur-[60px]" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-amber-300/15 blur-[80px]" />
+            <div className="absolute bottom-0 right-0 w-48 h-48 rounded-full bg-white/8 blur-[60px]" />
           </div>
 
           <div className="relative px-6 py-16 sm:px-12 sm:py-20 lg:py-24 text-center">
