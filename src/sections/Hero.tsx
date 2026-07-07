@@ -117,9 +117,9 @@ export default function Hero() {
                   {/* 右侧阴影边框 */}
                   <div className="absolute right-0 top-[3.5rem] bottom-[3.5rem] w-[3px] bg-gradient-to-b from-black/30 via-black/15 to-transparent" />
                   {/* 顶部高光 */}
-                  <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-[3.5rem] bg-gradient-to-r from-white/40 via-white/20 to-transparent" />
+                  <div className="absolute top-0 left-[3.5rem] right-[3.5rem] h-[3px] bg-gradient-to-r from-white/40 via-white/20 to-transparent" />
                   {/* 底部阴影 */}
-                  <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-b-[3.5rem] bg-gradient-to-r from-black/25 via-black/15 to-transparent" />
+                  <div className="absolute bottom-0 left-[3.5rem] right-[3.5rem] h-[3px] bg-gradient-to-r from-black/25 via-black/15 to-transparent" />
                 </div>
                 
                 {/* 屏幕区域 */}
