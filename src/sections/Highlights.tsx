@@ -1,4 +1,4 @@
-import { Globe, Headphones, Moon, Share2, FileText, Play, Lock, Music, SkipForward, SkipBack, Sun, Star, Sparkles, ListChecks, Volume2 } from "lucide-react";
+import { Globe, Headphones, Moon, Share2, FileText, Play, Lock, Music, SkipForward, SkipBack, Sun, Star, Sparkles, ListChecks, Volume2, MessageSquare } from "lucide-react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
 const HIGHLIGHTS = [
@@ -170,95 +170,6 @@ const HIGHLIGHTS = [
     ),
   },
   {
-    icon: Moon,
-    title: "明暗主题，随心切换",
-    description:
-      "跟随系统自动切换，或手动选择白天/暗黑模式。无论白天办公还是深夜阅读，都有最舒适的色彩体验。",
-    image: (
-      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden flex relative border border-white/10">
-        {/* ===== 明亮模式 ===== */}
-        <div className="w-1/2 bg-gradient-to-br from-amber-50 via-white to-orange-50/50 flex flex-col items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_30%,rgba(251,191,36,0.2),transparent_60%)]" />
-          <div className="absolute top-4 right-4 w-20 h-20 bg-amber-300/15 rounded-full blur-2xl" />
-          {/* 光线装饰 */}
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="absolute bg-amber-400/10 rounded-full" style={{ width: `${60 + i * 30}px`, height: `${60 + i * 30}px`, top: `${20 + i * 5}%`, left: `${30 - i * 8}%`, opacity: 0.3 - i * 0.06 }} />
-          ))}
-          
-          <div className="relative z-10 text-center space-y-3">
-            {/* 太阳图标 */}
-            <div className="relative inline-block">
-              <div className="absolute inset-0 bg-amber-400/40 blur-2xl rounded-full scale-[2.5]" />
-              <div className="absolute inset-0 bg-yellow-300/25 blur-xl rounded-full scale-[1.8]" />
-              <Sun className="w-16 h-16 text-amber-500 relative z-10 drop-shadow-lg mx-auto" strokeWidth={1.5} />
-            </div>
-            
-            {/* 模拟亮色阅读界面 */}
-            <div className="mx-auto w-28 rounded-lg bg-white/90 border border-slate-200/80 shadow-md overflow-hidden">
-              <div className="px-2.5 py-1.5 border-b border-slate-100 flex items-center gap-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                <div className="h-1 w-10 rounded-full bg-slate-200" />
-              </div>
-              <div className="p-2.5 space-y-1.5">
-                <div className="h-1.5 w-full rounded-full bg-slate-200/80" />
-                <div className="h-1.5 w-5/6 rounded-full bg-slate-200/60" />
-                <div className="h-1.5 w-4/6 rounded-full bg-amber-200/60" />
-                <div className="h-1.5 w-full rounded-full bg-slate-200/60" />
-                <div className="h-1.5 w-3/4 rounded-full bg-slate-200/40" />
-              </div>
-            </div>
-            
-            <span className="text-[10px] font-semibold text-amber-700/70 tracking-wide">日间模式</span>
-          </div>
-        </div>
-        
-        {/* ===== 中间分隔 ===== */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-px z-20">
-          <div className="w-full h-full bg-gradient-to-b from-transparent via-white/25 to-transparent" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-gradient-to-br from-amber-400/20 to-indigo-400/20 border border-white/20 backdrop-blur-sm flex items-center justify-center">
-            <Moon className="w-3.5 h-3.5 text-white/60" />
-          </div>
-        </div>
-        
-        {/* ===== 暗黑模式 ===== */}
-        <div className="w-1/2 bg-gradient-to-br from-slate-950 via-neutral-900 to-indigo-950/60 flex flex-col items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_70%,rgba(99,102,241,0.18),transparent_60%)]" />
-          <div className="absolute bottom-4 left-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-2xl" />
-          {/* 星星装饰 */}
-          {[...Array(6)].map((_, i) => (
-            <Star key={i} className="absolute text-white/15" style={{ width: `${6 + i % 3 * 2}px`, height: `${6 + i % 3 * 2}px`, top: `${10 + i * 14}%`, left: `${8 + i * 15}%` }} fill="currentColor" />
-          ))}
-          
-          <div className="relative z-10 text-center space-y-3">
-            {/* 月亮图标 */}
-            <div className="relative inline-block">
-              <div className="absolute inset-0 bg-indigo-500/35 blur-2xl rounded-full scale-[2.5]" />
-              <div className="absolute inset-0 bg-violet-400/20 blur-xl rounded-full scale-[1.8]" />
-              <Moon className="w-16 h-16 text-indigo-400 relative z-10 drop-shadow-lg mx-auto" fill="currentColor" strokeWidth={0} />
-            </div>
-            
-            {/* 模拟暗色阅读界面 */}
-            <div className="mx-auto w-28 rounded-lg bg-neutral-800/80 border border-white/[0.08] shadow-md overflow-hidden">
-              <div className="px-2.5 py-1.5 border-b border-white/[0.06] flex items-center gap-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                <div className="h-1 w-10 rounded-full bg-white/10" />
-              </div>
-              <div className="p-2.5 space-y-1.5">
-                <div className="h-1.5 w-full rounded-full bg-white/[0.08]" />
-                <div className="h-1.5 w-5/6 rounded-full bg-white/[0.06]" />
-                <div className="h-1.5 w-4/6 rounded-full bg-indigo-400/20" />
-                <div className="h-1.5 w-full rounded-full bg-white/[0.06]" />
-                <div className="h-1.5 w-3/4 rounded-full bg-white/[0.04]" />
-              </div>
-            </div>
-            
-            <span className="text-[10px] font-semibold text-indigo-300/60 tracking-wide">夜间模式</span>
-          </div>
-        </div>
-      </div>
-    ),
-  },
-  {
     icon: Sparkles,
     title: "AI 智能总结",
     description:
@@ -343,6 +254,189 @@ const HIGHLIGHTS = [
             </div>
             <span className="text-[10px] text-white/30">·</span>
             <span className="text-[10px] text-white/40">通义千问驱动</span>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    icon: MessageSquare,
+    title: "AI 伴读",
+    description:
+      "边听边问，听到不懂的内容随时提问。AI 基于当前朗读位置的上下文回答，支持多轮对话，知识越聊越深入。",
+    image: (
+      <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-cyan-950/80 via-slate-900/90 to-teal-950/70 border border-cyan-500/20 flex items-center justify-center overflow-hidden relative group">
+        {/* 网格背景 */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        {/* 多层光晕 */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_40%_25%,rgba(6,182,212,0.22),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_65%_75%,rgba(20,184,166,0.14),transparent_50%)]" />
+        <div className="absolute top-1/3 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-[80px]" />
+        <div className="absolute bottom-1/3 right-1/4 w-40 h-40 bg-teal-500/8 rounded-full blur-[60px]" />
+        
+        {/* 浮动装饰粒子 */}
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="absolute rounded-full bg-cyan-400/25 animate-bounce" style={{ width: `${3 + i % 3}px`, height: `${3 + i % 3}px`, top: `${12 + i * 16}%`, right: `${8 + i * 18}%`, animationDuration: `${2.2 + i * 0.6}s`, animationDelay: `${i * 0.4}s` }} />
+        ))}
+        
+        <div className="relative z-10 w-full px-8 py-6 space-y-5">
+          {/* 模拟播放器顶部栏 */}
+          <div className="mx-auto max-w-sm rounded-2xl bg-white/[0.06] backdrop-blur-xl border border-white/10 overflow-hidden shadow-2xl shadow-cyan-500/8">
+            {/* 播放器迷你状态栏 */}
+            <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-white/[0.06]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/30 to-cyan-500/20 border border-white/10 flex items-center justify-center">
+                  <FileText className="w-3.5 h-3.5 text-cyan-400" />
+                </div>
+                <div>
+                  <div className="text-[11px] font-semibold text-white/80">认知觉醒</div>
+                  <div className="text-[9px] text-white/40">正在朗读 · 第 5 章</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-[9px] text-green-300/80">播放中</span>
+              </div>
+            </div>
+            
+            {/* 对话区域 */}
+            <div className="px-5 py-4 space-y-3">
+              {/* 用户消息（右对齐） */}
+              <div className="flex justify-end">
+                <div className="max-w-[75%] px-3.5 py-2.5 rounded-2xl rounded-tr-md bg-cyan-600/40 border border-cyan-500/20">
+                  <p className="text-[11px] text-white/90 leading-relaxed">"元认知"是什么意思？</p>
+                </div>
+              </div>
+              
+              {/* AI 回复（左对齐） */}
+              <div className="flex justify-start">
+                <div className="max-w-[80%] px-3.5 py-2.5 rounded-2xl rounded-tl-md bg-white/[0.08] border border-white/[0.08]">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <MessageSquare className="w-3 h-3 text-cyan-400" />
+                    <span className="text-[9px] font-semibold text-cyan-300">AI 伴读</span>
+                  </div>
+                  <p className="text-[11px] text-white/70 leading-relaxed">元认知是指对自己思维过程的认知和监控能力，简单来说就是"思考自己的思考"。</p>
+                </div>
+              </div>
+              
+              {/* 快捷问题按钮 */}
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                <button className="px-2.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.10] text-[9px] text-white/50 hover:bg-white/10 transition-all">能举个例子吗？</button>
+                <button className="px-2.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.10] text-[9px] text-white/50 hover:bg-white/10 transition-all">和正念有什么区别？</button>
+              </div>
+            </div>
+            
+            {/* 底部输入栏 */}
+            <div className="px-5 pb-4">
+              <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+                <span className="text-[10px] text-white/30 flex-1">问我任何问题...</span>
+                <div className="w-7 h-7 rounded-lg bg-cyan-600/60 border border-cyan-500/30 flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 text-white">
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* 底部状态标签 */}
+          <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/25">
+              <MessageSquare className="w-3 h-3 text-cyan-400" />
+              <span className="text-[10px] text-cyan-300/90 font-medium">边听边问</span>
+            </div>
+            <span className="text-[10px] text-white/30">·</span>
+            <span className="text-[10px] text-white/40">通义千问驱动</span>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    icon: Moon,
+    title: "明暗主题，随心切换",
+    description:
+      "跟随系统自动切换，或手动选择白天/暗黑模式。无论白天办公还是深夜阅读，都有最舒适的色彩体验。",
+    image: (
+      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden flex relative border border-white/10">
+        {/* ===== 明亮模式 ===== */}
+        <div className="w-1/2 bg-gradient-to-br from-amber-50 via-white to-orange-50/50 flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_30%,rgba(251,191,36,0.2),transparent_60%)]" />
+          <div className="absolute top-4 right-4 w-20 h-20 bg-amber-300/15 rounded-full blur-2xl" />
+          {/* 光线装饰 */}
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="absolute bg-amber-400/10 rounded-full" style={{ width: `${60 + i * 30}px`, height: `${60 + i * 30}px`, top: `${20 + i * 5}%`, left: `${30 - i * 8}%`, opacity: 0.3 - i * 0.06 }} />
+          ))}
+          
+          <div className="relative z-10 text-center space-y-3">
+            {/* 太阳图标 */}
+            <div className="relative inline-block">
+              <div className="absolute inset-0 bg-amber-400/40 blur-2xl rounded-full scale-[2.5]" />
+              <div className="absolute inset-0 bg-yellow-300/25 blur-xl rounded-full scale-[1.8]" />
+              <Sun className="w-16 h-16 text-amber-500 relative z-10 drop-shadow-lg mx-auto" strokeWidth={1.5} />
+            </div>
+            
+            {/* 模拟亮色阅读界面 */}
+            <div className="mx-auto w-28 rounded-lg bg-white/90 border border-slate-200/80 shadow-md overflow-hidden">
+              <div className="px-2.5 py-1.5 border-b border-slate-100 flex items-center gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                <div className="h-1 w-10 rounded-full bg-slate-200" />
+              </div>
+              <div className="p-2.5 space-y-1.5">
+                <div className="h-1.5 w-full rounded-full bg-slate-200/80" />
+                <div className="h-1.5 w-5/6 rounded-full bg-slate-200/60" />
+                <div className="h-1.5 w-4/6 rounded-full bg-amber-200/60" />
+                <div className="h-1.5 w-full rounded-full bg-slate-200/60" />
+                <div className="h-1.5 w-3/4 rounded-full bg-slate-200/40" />
+              </div>
+            </div>
+            
+            <span className="text-[10px] font-semibold text-amber-700/70 tracking-wide">日间模式</span>
+          </div>
+        </div>
+        
+        {/* ===== 中间分隔 ===== */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-px z-20">
+          <div className="w-full h-full bg-gradient-to-b from-transparent via-white/25 to-transparent" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-gradient-to-br from-amber-400/20 to-indigo-400/20 border border-white/20 backdrop-blur-sm flex items-center justify-center">
+            <Moon className="w-3.5 h-3.5 text-white/60" />
+          </div>
+        </div>
+        
+        {/* ===== 暗黑模式 ===== */}
+        <div className="w-1/2 bg-gradient-to-br from-slate-950 via-neutral-900 to-indigo-950/60 flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_70%,rgba(99,102,241,0.18),transparent_60%)]" />
+          <div className="absolute bottom-4 left-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-2xl" />
+          {/* 星星装饰 */}
+          {[...Array(6)].map((_, i) => (
+            <Star key={i} className="absolute text-white/15" style={{ width: `${6 + i % 3 * 2}px`, height: `${6 + i % 3 * 2}px`, top: `${10 + i * 14}%`, left: `${8 + i * 15}%` }} fill="currentColor" />
+          ))}
+          
+          <div className="relative z-10 text-center space-y-3">
+            {/* 月亮图标 */}
+            <div className="relative inline-block">
+              <div className="absolute inset-0 bg-indigo-500/35 blur-2xl rounded-full scale-[2.5]" />
+              <div className="absolute inset-0 bg-violet-400/20 blur-xl rounded-full scale-[1.8]" />
+              <Moon className="w-16 h-16 text-indigo-400 relative z-10 drop-shadow-lg mx-auto" fill="currentColor" strokeWidth={0} />
+            </div>
+            
+            {/* 模拟暗色阅读界面 */}
+            <div className="mx-auto w-28 rounded-lg bg-neutral-800/80 border border-white/[0.08] shadow-md overflow-hidden">
+              <div className="px-2.5 py-1.5 border-b border-white/[0.06] flex items-center gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                <div className="h-1 w-10 rounded-full bg-white/10" />
+              </div>
+              <div className="p-2.5 space-y-1.5">
+                <div className="h-1.5 w-full rounded-full bg-white/[0.08]" />
+                <div className="h-1.5 w-5/6 rounded-full bg-white/[0.06]" />
+                <div className="h-1.5 w-4/6 rounded-full bg-indigo-400/20" />
+                <div className="h-1.5 w-full rounded-full bg-white/[0.06]" />
+                <div className="h-1.5 w-3/4 rounded-full bg-white/[0.04]" />
+              </div>
+            </div>
+            
+            <span className="text-[10px] font-semibold text-indigo-300/60 tracking-wide">夜间模式</span>
           </div>
         </div>
       </div>
