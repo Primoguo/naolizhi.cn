@@ -1,5 +1,43 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { ArrowDown, Star } from "lucide-react";
+
+// 磁吸效果 Hook
+function useMagnetic(magneticStrength = 0.3) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+  const onMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    if (!ref.current) return;
+    
+    const rect = ref.current.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    
+    // 计算鼠标距离按钮中心的距离
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    // 只有在一定范围内才产生磁吸效果（150px）
+    const maxDistance = 150;
+    if (distance < maxDistance) {
+      // 距离越近，吸引力越强
+      const strength = (1 - distance / maxDistance) * magneticStrength;
+      setOffset({
+        x: dx * strength,
+        y: dy * strength,
+      });
+    } else {
+      setOffset({ x: 0, y: 0 });
+    }
+  }, [magneticStrength]);
+
+  const onMouseLeave = useCallback(() => {
+    setOffset({ x: 0, y: 0 });
+  }, []);
+
+  return { ref, offset, onMouseMove, onMouseLeave };
+}
 
 export default function Hero() {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
@@ -47,16 +85,7 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-              <a
-                href="#download"
-                className="inline-flex rounded-md shadow-xl shadow-primary/30 hover:shadow-primary/40 transition-all hover:-translate-y-0.5"
-              >
-                <img
-                  src="/app-store-badge.svg"
-                  alt="Download on the App Store"
-                  className="h-10"
-                />
-              </a>
+              <MagneticButton />
               <a
                 href="#features"
                 className="inline-flex items-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-colors"
@@ -136,5 +165,33 @@ export default function Hero() {
         </div>
       </div>
     </section>
+  );
+}
+
+// 独立的磁吸按钮组件
+function MagneticButton() {
+  const { ref, offset, onMouseMove, onMouseLeave } = useMagnetic(0.35);
+
+  return (
+    <div
+      ref={ref}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      style={{
+        transform: `translate(${offset.x}px, ${offset.y}px)`,
+        transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+      }}
+    >
+      <a
+        href="#download"
+        className="inline-flex rounded-md shadow-xl shadow-primary/30 hover:shadow-primary/40 transition-all hover:-translate-y-0.5"
+      >
+        <img
+          src="/app-store-badge.svg"
+          alt="Download on the App Store"
+          className="h-10"
+        />
+      </a>
+    </div>
   );
 }
