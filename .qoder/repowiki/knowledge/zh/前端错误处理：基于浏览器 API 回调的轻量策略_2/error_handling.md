@@ -1,8 +1,8 @@
-本仓库为 Vite + React 19 单页官网，未实现统一的前端错误处理体系（无全局 ErrorBoundary、无自定义错误类型、无 try/catch 包装层、无中间件）。错误处理以“就近处理”为原则，仅在涉及外部浏览器 API 的组件内通过原生回调进行降级与状态恢复。
+本仓库为纯前端单页官网（Vite + React），未引入任何后端服务、中间件或统一错误框架。全局范围内未发现 `try/catch`、自定义 Error 类型、错误码定义或 panic/recover 等模式，仅有一处针对浏览器 Web Speech API 的异步事件回调错误处理。
 
-已发现的实践集中在 `src/sections/TTSDemo.tsx`：
-- 使用 `SpeechSynthesisUtterance.onerror` 回调在语音合成出错时重置 `isSpeaking` / `isPaused` / `highlightIndex` 等 UI 状态，避免界面卡死。
-- 通过 `window.speechSynthesis.onvoiceschanged` 异步加载声音列表，并在 `useEffect` 清理函数中置空监听器，防止内存泄漏。
-- 对不支持 Speech Synthesis 的浏览器直接渲染降级提示文本，而非抛出异常。
+- **唯一错误处理点**：`src/sections/TTSDemo.tsx` 中通过 `SpeechSynthesisUtterance.onerror` 回调在语音合成出错时重置播放状态（`setIsSpeaking(false)`、`setIsPaused(false)`、`setHighlightIndex(-1)`），属于“失败即降级”的 UI 状态恢复策略。
+- **能力检测式容错**：组件在渲染前检查 `window.speechSynthesis` 是否可用，不可用时直接返回友好提示文本，避免抛出异常。
+- **无全局错误边界**：项目中没有 `ErrorBoundary`、`window.onerror` 监听或第三方错误上报 SDK，意味着未捕获的运行时错误会直接导致页面白屏。
+- **无业务层错误模型**：由于项目不包含网络请求、表单校验或业务逻辑分支，不存在需要结构化传播的错误对象或错误码体系。
 
-其余模块（App、main、各 sections/hooks/lib）均未出现 `try/catch`、`throw`、`Error` 构造或 Promise `.catch` 等模式，说明该仓库当前不依赖运行时错误捕获机制。
+结论：该仓库在当前阶段无需统一的 error_handling 系统；若后续引入 API 调用或复杂交互，建议补充 React Error Boundary 与可观测性上报。

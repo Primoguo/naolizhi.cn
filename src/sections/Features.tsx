@@ -143,7 +143,7 @@ export default function Features() {
   const cardsRef = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section id="features" className="py-24 sm:py-32 relative">
+    <section id="features" className="py-24 sm:py-32 relative bg-[#050508]/95 backdrop-blur-sm border-y border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <div ref={headerRef} className="reveal text-center max-w-2xl mx-auto mb-16">

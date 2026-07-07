@@ -7,7 +7,7 @@ export default function CTA() {
   const { magRef, onMouseMove, onMouseLeave } = useMagnetic(0.2);
 
   return (
-    <section id="download" className="py-24 sm:py-32">
+    <section id="download" className="py-24 sm:py-32 bg-[#050508]/95 backdrop-blur-sm border-y border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div ref={ctaRef} className="reveal relative rounded-3xl bg-gradient-to-br from-primary to-red-600 overflow-hidden">
           {/* Decorative */}

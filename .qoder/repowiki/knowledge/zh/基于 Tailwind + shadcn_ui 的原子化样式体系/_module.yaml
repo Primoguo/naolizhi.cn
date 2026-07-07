@@ -4,10 +4,10 @@ title: 基于 Tailwind + shadcn/ui 的原子化样式体系
 scope: []
 source_files:
     - tailwind.config.js
-    - postcss.config.js
     - src/index.css
-    - src/App.css
+    - postcss.config.js
     - components.json
+    - src/App.css
     - src/components/ui/button.tsx
 depends_on: []
 related_to: []

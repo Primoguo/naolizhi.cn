@@ -149,6 +149,60 @@
   .animate-grid-move {
     animation: grid-move 20s linear infinite;
   }
+  
+  /* 进度条流动 */
+  @keyframes progress-flow {
+    0% { width: 0%; }
+    100% { width: 60%; }
+  }
+  .animate-progress-flow {
+    animation: progress-flow 3s ease-out forwards;
+  }
+  
+  /* 按钮脉冲发光 */
+  @keyframes button-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); transform: scale(1); }
+    50% { box-shadow: 0 0 20px 8px rgba(168, 85, 247, 0.2); transform: scale(1.02); }
+  }
+  .animate-button-glow {
+    animation: button-glow 2.5s ease-in-out infinite;
+  }
+  
+  /* 对话气泡淡入 */
+  @keyframes chat-fade-in {
+    from { opacity: 0; transform: translateY(10px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .animate-chat-fade-in {
+    animation: chat-fade-in 0.5s ease-out forwards;
+  }
+  
+  /* 图标旋转 */
+  @keyframes icon-rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .animate-icon-rotate {
+    animation: icon-rotate 8s linear infinite;
+  }
+  
+  /* 星星闪烁 */
+  @keyframes star-twinkle {
+    0%, 100% { opacity: 0.15; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.2); }
+  }
+  .animate-star-twinkle {
+    animation: star-twinkle 3s ease-in-out infinite;
+  }
+  
+  /* 光线扩散 */
+  @keyframes ray-expand {
+    0% { transform: scale(0.8); opacity: 0.3; }
+    100% { transform: scale(1.2); opacity: 0; }
+  }
+  .animate-ray-expand {
+    animation: ray-expand 4s ease-out infinite;
+  }
 
   /* ========== 聚光灯光晕 ========== */
   .spotlight-card {

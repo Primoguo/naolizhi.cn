@@ -3,25 +3,13 @@ schema_version: 1
 locale: zh-CN
 branch: main
 nodes_managed: true
-exported_at: "2026-07-07T15:43:40Z"
+exported_at: "2026-07-07T16:13:15Z"
 modules:
     "":
-        dir_name: 挠荔枝 Knowledge 官网项目根配置
-        title: 挠荔枝 Knowledge 官网项目根配置
+        dir_name: 挠荔枝 Knowledge 官网根工程（Vite + React 19 单页应用）
+        title: 挠荔枝 Knowledge 官网根工程（Vite + React 19 单页应用）
         scope:
-            - README.md
-            - .gitignore
-            - index.html
-            - package.json
-            - package-lock.json
-            - components.json
-            - eslint.config.js
-            - postcss.config.js
-            - tailwind.config.js
-            - tsconfig.json
-            - tsconfig.app.json
-            - tsconfig.node.json
-            - vite.config.ts
+            - '**'
         source_files: []
         children: []
         depends_on: []
@@ -36,9 +24,10 @@ modules:
             - tsconfig.json
             - tsconfig.app.json
             - tsconfig.node.json
+            - eslint.config.js
             - tailwind.config.js
             - postcss.config.js
-            - eslint.config.js
+            - components.json
         children: []
         depends_on: []
         related_to: []
@@ -73,8 +62,6 @@ modules:
         scope: []
         source_files:
             - src/sections/TTSDemo.tsx
-            - src/main.tsx
-            - src/App.tsx
         children: []
         depends_on: []
         related_to: []
@@ -84,10 +71,10 @@ modules:
         scope: []
         source_files:
             - tailwind.config.js
-            - src/index.css
             - postcss.config.js
-            - components.json
+            - src/index.css
             - src/App.css
+            - components.json
             - src/components/ui/button.tsx
         children: []
         depends_on: []

@@ -82,8 +82,8 @@ const HIGHLIGHTS = [
     reversed: true,
     image: (
       <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-red-950/80 via-slate-900/90 to-orange-950/70 border border-red-500/20 flex items-center justify-center overflow-hidden relative group">
-        {/* 网格背景 */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        {/* 网格背景 - 添加移动动画 */}
+        <div className="absolute inset-0 opacity-[0.03] animate-grid-move" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         {/* 多层光晕 */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,rgba(239,68,68,0.2),transparent_55%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_70%,rgba(249,115,22,0.12),transparent_50%)]" />
@@ -118,10 +118,10 @@ const HIGHLIGHTS = [
               </div>
             </div>
             
-            {/* 进度条 */}
+            {/* 进度条 - 添加流动动画 */}
             <div className="px-5 pb-2">
               <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
-                <div className="w-3/5 h-full rounded-full bg-gradient-to-r from-primary to-red-400" />
+                <div className="w-3/5 h-full rounded-full bg-gradient-to-r from-primary to-red-400 animate-progress-flow" />
               </div>
               <div className="flex justify-between mt-1">
                 <span className="text-[9px] text-white/30">3:24</span>
@@ -142,7 +142,7 @@ const HIGHLIGHTS = [
             </div>
           </div>
           
-          {/* 音频波形 */}
+          {/* 音频波形 - 已有 wave 动画，保持不变 */}
           <div className="flex items-end justify-center gap-1.5 h-10">
             {[12, 24, 18, 32, 14, 28, 20, 36, 16, 22, 30, 10, 26, 18, 34, 14].map((h, i) => (
               <div
@@ -156,9 +156,9 @@ const HIGHLIGHTS = [
             ))}
           </div>
           
-          {/* 底部标签 */}
+          {/* 底部标签 - 添加呼吸灯效果 */}
           <div className="flex items-center justify-center gap-2">
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/15 border border-green-500/25">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/15 border border-green-500/25 animate-glow-pulse">
               <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
               <span className="text-[10px] text-green-300/90 font-medium">后台播放中</span>
             </div>
@@ -176,8 +176,8 @@ const HIGHLIGHTS = [
       "导入文档后一键生成摘要，快速掌握核心要点。支持朗读摘要，让 AI 帮你提炼知识精华，节省阅读时间。",
     image: (
       <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-purple-950/80 via-slate-900/90 to-indigo-950/70 border border-purple-500/20 flex items-center justify-center overflow-hidden relative group">
-        {/* 网格背景 */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        {/* 网格背景 - 添加移动动画 */}
+        <div className="absolute inset-0 opacity-[0.03] animate-grid-move" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         {/* 多层光晕 */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,rgba(168,85,247,0.2),transparent_55%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_70%,rgba(99,102,241,0.12),transparent_50%)]" />
@@ -208,30 +208,30 @@ const HIGHLIGHTS = [
               <div className="h-2 w-4/6 rounded-full bg-white/[0.04]" />
             </div>
             
-            {/* AI 总结按钮 */}
+            {/* AI 总结按钮 - 添加脉冲发光效果 */}
             <div className="px-5 pb-4">
-              <button className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600/80 to-indigo-600/80 border border-purple-500/30 flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all">
+              <button className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600/80 to-indigo-600/80 border border-purple-500/30 flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all animate-button-glow">
                 <Sparkles className="w-4 h-4 text-white" />
                 <span className="text-xs font-semibold text-white">AI 总结</span>
               </button>
             </div>
             
-            {/* 生成的摘要卡片 */}
+            {/* 生成的摘要卡片 - 内容行依次淡入 */}
             <div className="mx-5 mb-5 p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 backdrop-blur-md">
               <div className="flex items-center gap-2 mb-3">
                 <ListChecks className="w-3.5 h-3.5 text-purple-400" />
                 <span className="text-[10px] font-semibold text-purple-300">核心要点</span>
               </div>
               <div className="space-y-2">
-                <div className="flex items-start gap-2">
+                <div className="flex items-start gap-2 animate-chat-fade-in" style={{ animationDelay: '0.1s' }}>
                   <div className="w-1 h-1 rounded-full bg-purple-400 mt-1.5 shrink-0" />
                   <div className="h-1.5 w-full rounded-full bg-purple-400/20" />
                 </div>
-                <div className="flex items-start gap-2">
+                <div className="flex items-start gap-2 animate-chat-fade-in" style={{ animationDelay: '0.2s' }}>
                   <div className="w-1 h-1 rounded-full bg-purple-400 mt-1.5 shrink-0" />
                   <div className="h-1.5 w-5/6 rounded-full bg-purple-400/20" />
                 </div>
-                <div className="flex items-start gap-2">
+                <div className="flex items-start gap-2 animate-chat-fade-in" style={{ animationDelay: '0.3s' }}>
                   <div className="w-1 h-1 rounded-full bg-purple-400 mt-1.5 shrink-0" />
                   <div className="h-1.5 w-4/6 rounded-full bg-purple-400/20" />
                 </div>
@@ -245,9 +245,9 @@ const HIGHLIGHTS = [
             </div>
           </div>
           
-          {/* 底部状态提示 */}
+          {/* 底部状态提示 - 添加呼吸灯效果 */}
           <div className="flex items-center justify-center gap-2">
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/25">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/25 animate-glow-pulse">
               <Sparkles className="w-3 h-3 text-purple-400 animate-pulse" />
               <span className="text-[10px] text-purple-300/90 font-medium">AI 已就绪</span>
             </div>
@@ -266,8 +266,8 @@ const HIGHLIGHTS = [
     reversed: true,
     image: (
       <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-cyan-950/80 via-slate-900/90 to-teal-950/70 border border-cyan-500/20 flex items-center justify-center overflow-hidden relative group">
-        {/* 网格背景 */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        {/* 网格背景 - 添加移动动画 */}
+        <div className="absolute inset-0 opacity-[0.03] animate-grid-move" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         {/* 多层光晕 */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_40%_25%,rgba(6,182,212,0.22),transparent_55%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_65%_75%,rgba(20,184,166,0.14),transparent_50%)]" />
@@ -299,17 +299,17 @@ const HIGHLIGHTS = [
               </div>
             </div>
             
-            {/* 对话区域 */}
+            {/* 对话区域 - 气泡依次淡入 */}
             <div className="px-5 py-4 space-y-3">
               {/* 用户消息（右对齐） */}
-              <div className="flex justify-end">
+              <div className="flex justify-end animate-chat-fade-in" style={{ animationDelay: '0.2s' }}>
                 <div className="max-w-[75%] px-3.5 py-2.5 rounded-2xl rounded-tr-md bg-cyan-600/40 border border-cyan-500/20">
                   <p className="text-[11px] text-white/90 leading-relaxed">"元认知"是什么意思？</p>
                 </div>
               </div>
               
               {/* AI 回复（左对齐） */}
-              <div className="flex justify-start">
+              <div className="flex justify-start animate-chat-fade-in" style={{ animationDelay: '0.4s' }}>
                 <div className="max-w-[80%] px-3.5 py-2.5 rounded-2xl rounded-tl-md bg-white/[0.08] border border-white/[0.08]">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <MessageSquare className="w-3 h-3 text-cyan-400" />
@@ -319,10 +319,10 @@ const HIGHLIGHTS = [
                 </div>
               </div>
               
-              {/* 快捷问题按钮 */}
+              {/* 快捷问题按钮 - 依次淡入 */}
               <div className="flex flex-wrap gap-1.5 pt-1">
-                <button className="px-2.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.10] text-[9px] text-white/50 hover:bg-white/10 transition-all">能举个例子吗？</button>
-                <button className="px-2.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.10] text-[9px] text-white/50 hover:bg-white/10 transition-all">和正念有什么区别？</button>
+                <button className="px-2.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.10] text-[9px] text-white/50 hover:bg-white/10 transition-all animate-chat-fade-in" style={{ animationDelay: '0.6s' }}>能举个例子吗？</button>
+                <button className="px-2.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.10] text-[9px] text-white/50 hover:bg-white/10 transition-all animate-chat-fade-in" style={{ animationDelay: '0.7s' }}>和正念有什么区别？</button>
               </div>
             </div>
             
@@ -340,9 +340,9 @@ const HIGHLIGHTS = [
             </div>
           </div>
           
-          {/* 底部状态标签 */}
+          {/* 底部状态标签 - 添加呼吸灯效果 */}
           <div className="flex items-center justify-center gap-2">
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/25">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/25 animate-glow-pulse">
               <MessageSquare className="w-3 h-3 text-cyan-400" />
               <span className="text-[10px] text-cyan-300/90 font-medium">边听边问</span>
             </div>
@@ -360,65 +360,21 @@ const HIGHLIGHTS = [
       "跟随系统自动切换，或手动选择白天/暗黑模式。无论白天办公还是深夜阅读，都有最舒适的色彩体验。",
     image: (
       <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden flex relative border border-white/10">
-        {/* ===== 暗黑模式（左侧）===== */}
-        <div className="w-1/2 bg-gradient-to-br from-slate-950 via-neutral-900 to-indigo-950/60 flex flex-col items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_70%,rgba(99,102,241,0.18),transparent_60%)]" />
-          <div className="absolute bottom-4 left-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-2xl" />
-          {/* 星星装饰 */}
-          {[...Array(6)].map((_, i) => (
-            <Star key={i} className="absolute text-white/15" style={{ width: `${6 + i % 3 * 2}px`, height: `${6 + i % 3 * 2}px`, top: `${10 + i * 14}%`, left: `${8 + i * 15}%` }} fill="currentColor" />
-          ))}
-          
-          <div className="relative z-10 text-center space-y-3">
-            {/* 月亮图标 */}
-            <div className="relative inline-block">
-              <div className="absolute inset-0 bg-indigo-500/35 blur-2xl rounded-full scale-[2.5]" />
-              <div className="absolute inset-0 bg-violet-400/20 blur-xl rounded-full scale-[1.8]" />
-              <Moon className="w-16 h-16 text-indigo-400 relative z-10 drop-shadow-lg mx-auto" fill="currentColor" strokeWidth={0} />
-            </div>
-            
-            {/* 模拟暗色阅读界面 */}
-            <div className="mx-auto w-28 rounded-lg bg-neutral-800/80 border border-white/[0.08] shadow-md overflow-hidden">
-              <div className="px-2.5 py-1.5 border-b border-white/[0.06] flex items-center gap-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                <div className="h-1 w-10 rounded-full bg-white/10" />
-              </div>
-              <div className="p-2.5 space-y-1.5">
-                <div className="h-1.5 w-full rounded-full bg-white/[0.08]" />
-                <div className="h-1.5 w-5/6 rounded-full bg-white/[0.06]" />
-                <div className="h-1.5 w-4/6 rounded-full bg-indigo-400/20" />
-                <div className="h-1.5 w-full rounded-full bg-white/[0.06]" />
-                <div className="h-1.5 w-3/4 rounded-full bg-white/[0.04]" />
-              </div>
-            </div>
-            
-            <span className="text-[10px] font-semibold text-indigo-300/60 tracking-wide">夜间模式</span>
-          </div>
-        </div>
-        
-        {/* ===== 中间分隔 ===== */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-px z-20">
-          <div className="w-full h-full bg-gradient-to-b from-transparent via-white/25 to-transparent" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400/20 to-amber-400/20 border border-white/20 backdrop-blur-sm flex items-center justify-center">
-            <Sun className="w-3.5 h-3.5 text-white/60" />
-          </div>
-        </div>
-        
-        {/* ===== 明亮模式（右侧）===== */}
+        {/* ===== 明亮模式（左侧）===== */}
         <div className="w-1/2 bg-gradient-to-br from-amber-50 via-white to-orange-50/50 flex flex-col items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_30%,rgba(251,191,36,0.2),transparent_60%)]" />
           <div className="absolute top-4 right-4 w-20 h-20 bg-amber-300/15 rounded-full blur-2xl" />
-          {/* 光线装饰 */}
+          {/* 光线装饰 - 添加扩散动画 */}
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="absolute bg-amber-400/10 rounded-full" style={{ width: `${60 + i * 30}px`, height: `${60 + i * 30}px`, top: `${20 + i * 5}%`, left: `${30 - i * 8}%`, opacity: 0.3 - i * 0.06 }} />
+            <div key={i} className="absolute bg-amber-400/10 rounded-full animate-ray-expand" style={{ width: `${60 + i * 30}px`, height: `${60 + i * 30}px`, top: `${20 + i * 5}%`, left: `${30 - i * 8}%`, opacity: 0.3 - i * 0.06, animationDelay: `${i * 1}s` }} />
           ))}
           
           <div className="relative z-10 text-center space-y-3">
-            {/* 太阳图标 */}
+            {/* 太阳图标 - 添加缓慢旋转效果 */}
             <div className="relative inline-block">
               <div className="absolute inset-0 bg-amber-400/40 blur-2xl rounded-full scale-[2.5]" />
               <div className="absolute inset-0 bg-yellow-300/25 blur-xl rounded-full scale-[1.8]" />
-              <Sun className="w-16 h-16 text-amber-500 relative z-10 drop-shadow-lg mx-auto" strokeWidth={1.5} />
+              <Sun className="w-16 h-16 text-amber-500 relative z-10 drop-shadow-lg mx-auto animate-icon-rotate" strokeWidth={1.5} />
             </div>
             
             {/* 模拟亮色阅读界面 */}
@@ -439,6 +395,50 @@ const HIGHLIGHTS = [
             <span className="text-[10px] font-semibold text-amber-700/70 tracking-wide">日间模式</span>
           </div>
         </div>
+        
+        {/* ===== 中间分隔 ===== */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-px z-20">
+          <div className="w-full h-full bg-gradient-to-b from-transparent via-white/25 to-transparent" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-gradient-to-br from-amber-400/20 to-indigo-400/20 border border-white/20 backdrop-blur-sm flex items-center justify-center">
+            <Sun className="w-3.5 h-3.5 text-white/60" />
+          </div>
+        </div>
+        
+        {/* ===== 暗黑模式（右侧）===== */}
+        <div className="w-1/2 bg-gradient-to-br from-slate-950 via-neutral-900 to-indigo-950/60 flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_70%,rgba(99,102,241,0.18),transparent_60%)]" />
+          <div className="absolute bottom-4 left-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-2xl" />
+          {/* 星星装饰 - 添加闪烁动画 */}
+          {[...Array(6)].map((_, i) => (
+            <Star key={i} className="absolute text-white/15 animate-star-twinkle" style={{ width: `${6 + i % 3 * 2}px`, height: `${6 + i % 3 * 2}px`, top: `${10 + i * 14}%`, left: `${8 + i * 15}%`, animationDelay: `${i * 0.5}s` }} fill="currentColor" />
+          ))}
+          
+          <div className="relative z-10 text-center space-y-3">
+            {/* 月亮图标 - 添加缓慢旋转效果 */}
+            <div className="relative inline-block">
+              <div className="absolute inset-0 bg-indigo-500/35 blur-2xl rounded-full scale-[2.5]" />
+              <div className="absolute inset-0 bg-violet-400/20 blur-xl rounded-full scale-[1.8]" />
+              <Moon className="w-16 h-16 text-indigo-400 relative z-10 drop-shadow-lg mx-auto animate-icon-rotate" fill="currentColor" strokeWidth={0} />
+            </div>
+            
+            {/* 模拟暗色阅读界面 */}
+            <div className="mx-auto w-28 rounded-lg bg-neutral-800/80 border border-white/[0.08] shadow-md overflow-hidden">
+              <div className="px-2.5 py-1.5 border-b border-white/[0.06] flex items-center gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                <div className="h-1 w-10 rounded-full bg-white/10" />
+              </div>
+              <div className="p-2.5 space-y-1.5">
+                <div className="h-1.5 w-full rounded-full bg-white/[0.08]" />
+                <div className="h-1.5 w-5/6 rounded-full bg-white/[0.06]" />
+                <div className="h-1.5 w-4/6 rounded-full bg-indigo-400/20" />
+                <div className="h-1.5 w-full rounded-full bg-white/[0.06]" />
+                <div className="h-1.5 w-3/4 rounded-full bg-white/[0.04]" />
+              </div>
+            </div>
+            
+            <span className="text-[10px] font-semibold text-indigo-300/60 tracking-wide">夜间模式</span>
+          </div>
+        </div>
       </div>
     ),
   },
@@ -448,7 +448,7 @@ export default function Highlights() {
   const headerRef = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="py-24 sm:py-32 bg-white/[0.03] backdrop-blur-sm border-y border-white/5">
+    <section className="py-24 sm:py-32 bg-[#050508]/95 backdrop-blur-sm border-y border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div ref={headerRef} className="reveal text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
