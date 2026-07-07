@@ -117,11 +117,11 @@ function FeatureCard({ feature }: { feature: typeof FEATURES[number] }) {
     <div
       ref={spotRef}
       onMouseMove={onMouseMove}
-      className="spotlight-card group relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-white/20 transition-all duration-500 hover:-translate-y-1 overflow-hidden h-full"
+      className="spotlight-card group relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-white/20 transition-all duration-500 hover:-translate-y-1 flex flex-col"
     >
       {/* 聚光灯光晕层 */}
       <div className="spotlight-glow pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <CardContent className="relative p-8">
+      <CardContent className="relative p-6 flex flex-col flex-1">
         {/* Icon */}
         <div
           className={`w-14 h-14 rounded-2xl ${getBgColor(feature.iconClass)} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
