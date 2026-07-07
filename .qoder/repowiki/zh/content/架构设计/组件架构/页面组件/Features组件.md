@@ -6,7 +6,6 @@
 - [src/components/ui/card.tsx](file://src/components/ui/card.tsx)
 - [src/hooks/use-scroll-reveal.ts](file://src/hooks/use-scroll-reveal.ts)
 - [src/hooks/use-spotlight.ts](file://src/hooks/use-spotlight.ts)
-- [src/hooks/use-magnetic.ts](file://src/hooks/use-magnetic.ts)
 - [src/lib/utils.ts](file://src/lib/utils.ts)
 - [src/index.css](file://src/index.css)
 - [tailwind.config.js](file://tailwind.config.js)
@@ -14,10 +13,10 @@
 
 ## 更新摘要
 **变更内容**   
-- 新增两大AI功能卡片：AI总结（紫色芯片图标）和AI伴读（青色对话气泡图标）
-- 网格布局从三列扩展到五列，支持更多特性展示
-- 增强背景色映射系统，支持新的紫色和青色主题
-- 优化图标设计，采用更直观的AI相关视觉元素
+- **修复关键溢出问题**：解决了特性卡片中文本截断的严重问题，通过添加`flex flex-col`和`flex-1`属性确保卡片高度一致
+- **优化卡片布局系统**：使用Flexbox属性实现统一的卡片高度，改善内容溢出处理
+- **简化图标导入**：将"多格式导入"功能图标从内联SVG替换为lucide-react的Files组件，提升代码可维护性
+- **增强背景效果**：为主区块添加backdrop-blur-sm模糊效果，配合半透明背景色创建更现代的视觉层次
 
 ## 目录
 1. [简介](#简介)
@@ -32,7 +31,7 @@
 10. [附录：扩展与自定义样式](#附录扩展与自定义样式)
 
 ## 简介
-本文件为"特性展示"（Features）组件的完整技术文档。该组件以数据驱动的方式渲染一组功能卡片，结合滚动入场动画、鼠标跟随聚光灯效果与响应式网格布局，提供流畅且可访问的用户体验。**最新更新**：组件现已支持五大核心功能展示，包括新增的AI智能功能，通过增强的网格布局系统实现更丰富的信息呈现。
+本文件为"特性展示"（Features）组件的完整技术文档。该组件以数据驱动的方式渲染一组功能卡片，结合滚动入场动画、鼠标跟随聚光灯效果与响应式网格布局，提供流畅且可访问的用户体验。**最新更新**：组件现已支持五大核心功能展示，包括新增的AI智能功能，通过增强的网格布局系统和优化的卡片布局机制实现更丰富的信息呈现。
 
 ## 项目结构
 Features组件位于页面区块模块中，使用UI层卡片组件与多个自定义Hooks组合完成交互与动效；样式通过Tailwind与全局CSS变量协同控制。
@@ -48,40 +47,38 @@ end
 subgraph "Hooks"
 SR["use-scroll-reveal.ts"]
 SP["use-spotlight.ts"]
-MG["use-magnetic.ts"]
 end
 subgraph "工具与样式"
 U["utils.ts"]
 CSS["index.css"]
 TW["tailwind.config.js"]
+LUCIDE["lucide-react (Files)"]
 end
 F --> C
 F --> SR
 F --> SP
-F -.可选.-> MG
+F -.-> LUCIDE
 C --> U
 F --> CSS
 F --> TW
 ```
 
 **图表来源**
-- [src/sections/Features.tsx:1-169](file://src/sections/Features.tsx#L1-L169)
+- [src/sections/Features.tsx:1-159](file://src/sections/Features.tsx#L1-L159)
 - [src/components/ui/card.tsx:1-93](file://src/components/ui/card.tsx#L1-L93)
 - [src/hooks/use-scroll-reveal.ts:1-34](file://src/hooks/use-scroll-reveal.ts#L1-L34)
 - [src/hooks/use-spotlight.ts:1-21](file://src/hooks/use-spotlight.ts#L1-L21)
-- [src/hooks/use-magnetic.ts:1-32](file://src/hooks/use-magnetic.ts#L1-L32)
 - [src/lib/utils.ts:1-7](file://src/lib/utils.ts#L1-L7)
-- [src/index.css:80-116](file://src/index.css#L80-L116)
+- [src/index.css:80-238](file://src/index.css#L80-L238)
 - [tailwind.config.js:1-92](file://tailwind.config.js#L1-L92)
 
 **章节来源**
-- [src/sections/Features.tsx:1-169](file://src/sections/Features.tsx#L1-L169)
+- [src/sections/Features.tsx:1-159](file://src/sections/Features.tsx#L1-L159)
 - [src/components/ui/card.tsx:1-93](file://src/components/ui/card.tsx#L1-L93)
 - [src/hooks/use-scroll-reveal.ts:1-34](file://src/hooks/use-scroll-reveal.ts#L1-L34)
 - [src/hooks/use-spotlight.ts:1-21](file://src/hooks/use-spotlight.ts#L1-L21)
-- [src/hooks/use-magnetic.ts:1-32](file://src/hooks/use-magnetic.ts#L1-L32)
 - [src/lib/utils.ts:1-7](file://src/lib/utils.ts#L1-L7)
-- [src/index.css:80-116](file://src/index.css#L80-L116)
+- [src/index.css:80-238](file://src/index.css#L80-L238)
 - [tailwind.config.js:1-92](file://tailwind.config.js#L1-L92)
 
 ## 核心组件与数据模型
@@ -91,14 +88,14 @@ F --> TW
 - **聚光灯效果**：通过更新CSS变量--x/--y，配合radial-gradient实现跟随光标的光晕
 - **响应式网格**：基于Tailwind的grid-cols在不同断点切换列数，形成自适应布局
 
-**更新**：数据模型现已扩展至五个特性，新增AI总结与AI伴读功能，采用独特的视觉标识系统
+**更新**：数据模型现已扩展至五个特性，新增AI总结与AI伴读功能，采用独特的视觉标识系统。同时修复了关键的文本溢出问题，确保所有卡片内容都能完整显示。
 
 **章节来源**
-- [src/sections/Features.tsx:5-100](file://src/sections/Features.tsx#L5-L100)
+- [src/sections/Features.tsx:6-90](file://src/sections/Features.tsx#L6-L90)
 - [src/components/ui/card.tsx:64-72](file://src/components/ui/card.tsx#L64-L72)
 - [src/hooks/use-scroll-reveal.ts:1-34](file://src/hooks/use-scroll-reveal.ts#L1-L34)
 - [src/hooks/use-spotlight.ts:1-21](file://src/hooks/use-spotlight.ts#L1-L21)
-- [src/index.css:80-116](file://src/index.css#L80-L116)
+- [src/index.css:80-238](file://src/index.css#L80-L238)
 
 ## 架构总览
 Features组件采用"数据驱动 + Hooks组合"的轻量架构：
@@ -126,10 +123,10 @@ DOM-->>Card : radial-gradient 光晕跟随
 ```
 
 **图表来源**
-- [src/sections/Features.tsx:141-168](file://src/sections/Features.tsx#L141-L168)
+- [src/sections/Features.tsx:131-158](file://src/sections/Features.tsx#L131-L158)
 - [src/hooks/use-spotlight.ts:8-20](file://src/hooks/use-spotlight.ts#L8-L20)
 - [src/hooks/use-scroll-reveal.ts:7-33](file://src/hooks/use-scroll-reveal.ts#L7-L33)
-- [src/index.css:80-116](file://src/index.css#L80-L116)
+- [src/index.css:80-238](file://src/index.css#L80-L238)
 
 ## 详细组件分析
 
@@ -138,7 +135,7 @@ DOM-->>Card : radial-gradient 光晕跟随
   - title: 卡片标题文本
   - description: 卡片描述文本  
   - iconClass: 图标颜色类名（如 amber/red/green/purple/cyan）
-  - icon: 图标JSX（SVG节点）
+  - icon: 图标JSX（SVG节点或外部组件）
 - **渲染方式**
   - 遍历数据数组，为每项创建FeatureCard实例
   - 每个卡片接收feature对象作为props
@@ -146,43 +143,48 @@ DOM-->>Card : radial-gradient 光晕跟随
   - 新增特性只需在数据数组追加对象，无需修改渲染逻辑
   - 可通过扩展iconClass或新增背景色映射来支持新主题色
 
-**更新**：数据模型现已支持五种不同的图标主题色，包括新增的紫色和青色AI功能标识
+**更新**：数据模型现已支持五种不同的图标主题色，包括新增的紫色和青色AI功能标识。同时优化了图标导入方式，支持外部图标库组件。
 
 **章节来源**
-- [src/sections/Features.tsx:5-100](file://src/sections/Features.tsx#L5-L100)
-- [src/sections/Features.tsx:103-139](file://src/sections/Features.tsx#L103-L139)
+- [src/sections/Features.tsx:6-90](file://src/sections/Features.tsx#L6-L90)
+- [src/sections/Features.tsx:93-129](file://src/sections/Features.tsx#L93-L129)
 
 ### 卡片布局系统与响应式网格
 - **布局容器**
   - 使用grid布局，md断点下三列，lg断点下五列，gap统一间距
   - 最大宽度居中，左右留白适配不同屏幕
+  - 添加`[&>*]:min-w-0`防止子元素溢出
 - **卡片结构**
   - 外层容器负责边框、半透明背景、模糊、悬停位移与光晕层
   - 内层CardContent承载图标、标题与描述
+  - **关键优化**：使用`flex flex-col`和`flex-1`确保所有卡片高度一致
 - **图标区**
   - 根据iconClass动态生成背景色块，悬停放大
   - 图标颜色由iconClass控制，保持视觉一致性
 
-**更新**：网格布局已从三列扩展至五列，更好地展示AI功能的丰富特性
+**更新**：网格布局已从三列扩展至五列，更好地展示AI功能的丰富特性。通过Flexbox布局优化解决了文本溢出问题，确保长文本内容能够完整显示而不被截断。
 
 **章节来源**
-- [src/sections/Features.tsx:160](file://src/sections/Features.tsx#L160)
-- [src/sections/Features.tsx:116-139](file://src/sections/Features.tsx#L116-L139)
+- [src/sections/Features.tsx:150](file://src/sections/Features.tsx#L150)
+- [src/sections/Features.tsx:107-127](file://src/sections/Features.tsx#L107-L127)
 - [src/components/ui/card.tsx:64-72](file://src/components/ui/card.tsx#L64-L72)
 
 ### 图标集成方案
 - **图标来源**
-  - 直接内联SVG JSX，避免额外资源请求
+  - 支持多种图标形式：内联SVG JSX、外部图标库组件（如lucide-react）
+  - 简化导入：使用`import { Files } from "lucide-react"`直接引入标准图标
 - **样式绑定**
   - 通过iconClass传递颜色类名，统一控制图标与背景色块
 - **可替换性**
-  - 可将SVG替换为外部图标库组件，保持接口不变
+  - 可将任何React组件作为图标，保持接口不变
 
-**更新**：新增AI相关的专业图标设计，包括芯片图案和对话气泡，增强AI功能的视觉识别度
+**更新**：新增对lucide-react图标库的支持，"多格式导入"功能现在使用标准的Files组件，提升了代码的可维护性和一致性。
 
 **章节来源**
-- [src/sections/Features.tsx:11-99](file://src/sections/Features.tsx#L11-L99)
-- [src/sections/Features.tsx:126-132](file://src/sections/Features.tsx#L126-L132)
+- [src/sections/Features.tsx:1](file://src/sections/Features.tsx#L1)
+- [src/sections/Features.tsx:11-12](file://src/sections/Features.tsx#L11-L12)
+- [src/sections/Features.tsx:19-88](file://src/sections/Features.tsx#L19-L88)
+- [src/sections/Features.tsx:119-121](file://src/sections/Features.tsx#L119-L121)
 
 ### 动画效果实现
 - **滚动入场**
@@ -214,7 +216,7 @@ Wait --> Observe
 **章节来源**
 - [src/hooks/use-scroll-reveal.ts:1-34](file://src/hooks/use-scroll-reveal.ts#L1-L34)
 - [src/hooks/use-spotlight.ts:1-21](file://src/hooks/use-spotlight.ts#L1-L21)
-- [src/index.css:80-116](file://src/index.css#L80-L116)
+- [src/index.css:80-238](file://src/index.css#L80-L238)
 
 ### 状态管理机制
 - **无全局状态**
@@ -238,8 +240,7 @@ Wait --> Observe
   - 文本颜色与背景对比度满足基础可读性要求；深色模式下通过CSS变量调整
 
 **章节来源**
-- [src/sections/Features.tsx:145-167](file://src/sections/Features.tsx#L145-L167)
-- [src/components/ui/button.tsx:1-63](file://src/components/ui/button.tsx#L1-L63)
+- [src/sections/Features.tsx:135-156](file://src/sections/Features.tsx#L135-L156)
 - [src/index.css:8-68](file://src/index.css#L8-L68)
 
 ### 错误处理最佳实践
@@ -249,16 +250,22 @@ Wait --> Observe
   - IntersectionObserver在旧环境可能不可用，需降级处理
 - **事件安全**
   - 在onMouseMove中检查元素引用存在性，避免空指针
+- **布局溢出防护**
+  - 使用`min-w-0`和flex布局属性防止内容溢出导致布局破坏
+
+**更新**：新增针对布局溢出的专门防护措施，确保在各种屏幕尺寸和内容长度下都能保持良好的布局稳定性。
 
 **章节来源**
 - [src/hooks/use-scroll-reveal.ts:12-22](file://src/hooks/use-scroll-reveal.ts#L12-L22)
 - [src/hooks/use-spotlight.ts:11-17](file://src/hooks/use-spotlight.ts#L11-L17)
+- [src/sections/Features.tsx:150](file://src/sections/Features.tsx#L150)
 
 ## 依赖关系分析
 - **组件依赖**
   - Features依赖CardContent进行内容包裹
   - FeatureCard依赖useSpotlight实现光晕
   - 整体依赖useScrollReveal实现滚动入场
+  - **新增**：支持lucide-react图标库组件
 - **工具与样式**
   - cn工具函数合并类名
   - Tailwind配置提供主题色、圆角、阴影与动画
@@ -270,11 +277,13 @@ class Features {
 +渲染特性区块
 +使用 useScrollReveal()
 +支持5个特性展示
++backdrop-blur背景效果
 }
 class FeatureCard {
 +接收 feature props
 +使用 useSpotlight()
 +支持多主题色
++flex布局防溢出
 }
 class CardContent {
 +包裹内容区域
@@ -287,20 +296,25 @@ class useSpotlight {
 +返回 spotRef, onMouseMove
 +更新 --x/--y
 }
+class LucideIcons {
++Files组件
++其他标准图标
+}
 Features --> FeatureCard : "渲染"
 FeatureCard --> CardContent : "使用"
 FeatureCard --> useSpotlight : "依赖"
 Features --> useScrollReveal : "依赖"
+FeatureCard --> LucideIcons : "可选使用"
 ```
 
 **图表来源**
-- [src/sections/Features.tsx:103-168](file://src/sections/Features.tsx#L103-L168)
+- [src/sections/Features.tsx:93-158](file://src/sections/Features.tsx#L93-L158)
 - [src/components/ui/card.tsx:64-72](file://src/components/ui/card.tsx#L64-L72)
 - [src/hooks/use-spotlight.ts:8-20](file://src/hooks/use-spotlight.ts#L8-L20)
 - [src/hooks/use-scroll-reveal.ts:7-33](file://src/hooks/use-scroll-reveal.ts#L7-L33)
 
 **章节来源**
-- [src/sections/Features.tsx:1-169](file://src/sections/Features.tsx#L1-L169)
+- [src/sections/Features.tsx:1-159](file://src/sections/Features.tsx#L1-L159)
 - [src/components/ui/card.tsx:1-93](file://src/components/ui/card.tsx#L1-L93)
 - [src/hooks/use-spotlight.ts:1-21](file://src/hooks/use-spotlight.ts#L1-L21)
 - [src/hooks/use-scroll-reveal.ts:1-34](file://src/hooks/use-scroll-reveal.ts#L1-L34)
@@ -315,10 +329,15 @@ Features --> useScrollReveal : "依赖"
   - 高频mousemove可考虑节流或requestAnimationFrame优化（按需）
 - **样式合并**
   - 使用cn工具函数合并类名，避免重复计算
+- **布局性能**
+  - Flexbox布局比传统浮动布局具有更好的性能表现
+  - 避免不必要的重排，使用will-change优化动画性能
+
+**更新**：新增Flexbox布局的性能优势说明，以及针对现代浏览器的布局优化策略。
 
 **章节来源**
 - [src/hooks/use-scroll-reveal.ts:12-30](file://src/hooks/use-scroll-reveal.ts#L12-L30)
-- [src/index.css:80-116](file://src/index.css#L80-L116)
+- [src/index.css:80-238](file://src/index.css#L80-L238)
 - [src/lib/utils.ts:4-6](file://src/lib/utils.ts#L4-L6)
 
 ## 故障排查指南
@@ -335,35 +354,52 @@ Features --> useScrollReveal : "依赖"
 - **AI功能图标显示异常**
   - 检查purple和cyan颜色类名是否正确映射
   - 确认新增的背景色映射逻辑正常工作
+- **文本溢出问题**
+  - 确认卡片使用了`flex flex-col`和`flex-1`属性
+  - 检查网格容器是否添加了`[&>*]:min-w-0`防止溢出
+  - 验证内容区域的padding和margin设置
+- **图标导入错误**
+  - 确认lucide-react已正确安装和导入
+  - 检查图标组件的className和size属性设置
 
-**更新**：新增针对AI功能图标的专门排查指南
+**更新**：新增针对文本溢出问题和图标导入错误的专门排查指南，帮助开发者快速定位和解决常见问题。
 
 **章节来源**
 - [src/hooks/use-scroll-reveal.ts:12-30](file://src/hooks/use-scroll-reveal.ts#L12-L30)
 - [src/hooks/use-spotlight.ts:11-17](file://src/hooks/use-spotlight.ts#L11-L17)
-- [src/index.css:80-116](file://src/index.css#L80-L116)
+- [src/index.css:80-238](file://src/index.css#L80-L238)
 - [src/sections/Features.tsx:107-114](file://src/sections/Features.tsx#L107-L114)
+- [src/sections/Features.tsx:150](file://src/sections/Features.tsx#L150)
 
 ## 结论
 Features组件以简洁的数据驱动模式与Hooks组合实现了高可用、易扩展的特性展示能力。**最新升级**：通过新增AI智能功能和增强的网格布局系统，组件现在能够更有效地展示产品的智能化特性。通过IntersectionObserver与CSS变量的协作，既保证了动画性能，又降低了复杂度。响应式网格与主题变量使组件在多端与多主题场景下保持一致体验，特别是新增的五列布局为AI功能的展示提供了更好的空间利用。
+
+**重要改进**：本次更新重点解决了关键的文本溢出问题，通过Flexbox布局优化确保了所有卡片的高度一致性和内容的完整显示。同时简化了图标导入方式，支持现代化的图标库组件，提升了代码的可维护性。背景模糊效果的加入进一步增强了视觉层次感。
 
 ## 附录：扩展与自定义样式
 - **扩展方法**
   - 新增特性：在数据数组追加对象，保持字段一致
   - 新增图标主题：扩展getBgColor映射逻辑，增加对应背景色类
   - 替换图标：将SVG替换为图标组件，保持icon字段类型兼容
+  - **新增**：支持lucide-react等外部图标库的直接导入
 - **自定义样式**
   - 调整入场动画：修改index.css中的.reveal与.reveal-stagger过渡参数
   - 调整光晕半径与颜色：修改spotlight-glow的radial-gradient参数
   - 调整网格间距与列数：修改grid与gap的Tailwind类
+  - **新增**：调整背景模糊效果：修改section的backdrop-blur-sm类
 - **主题配置**
   - 通过tailwind.config.js扩展colors、borderRadius、boxShadow等
   - 通过index.css的CSS变量统一管理明暗主题
+- **布局定制**
+  - 调整卡片最小宽度：修改`[&>*]:min-w-0`的值
+  - 自定义Flexbox行为：调整flex相关的Tailwind类
+  - 优化响应式断点：修改grid-cols的断点配置
 
-**更新**：新增针对AI功能主题的扩展指南，包括紫色和青色主题色的使用方法
+**更新**：新增针对图标导入、背景模糊效果和布局定制的扩展指南，为开发者提供更多自定义选项。
 
 **章节来源**
 - [src/sections/Features.tsx:107-114](file://src/sections/Features.tsx#L107-L114)
-- [src/sections/Features.tsx:160](file://src/sections/Features.tsx#L160)
-- [src/index.css:80-116](file://src/index.css#L80-L116)
+- [src/sections/Features.tsx:136](file://src/sections/Features.tsx#L136)
+- [src/sections/Features.tsx:150](file://src/sections/Features.tsx#L150)
+- [src/index.css:80-238](file://src/index.css#L80-L238)
 - [tailwind.config.js:1-92](file://tailwind.config.js#L1-L92)

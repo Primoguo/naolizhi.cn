@@ -1,29 +1,24 @@
-本项目采用 Tailwind CSS + shadcn/ui 的原子化样式方案，通过 CSS 变量驱动主题、class-variance-authority 管理组件变体，形成统一的视觉系统。
+本项目采用 Tailwind CSS + shadcn/ui 的原子化样式方案，通过 CSS 变量驱动主题、class-variance-authority 管理变体，形成统一的视觉语言。
 
-## 样式架构与工具链
-- 构建层：Vite + PostCSS（autoprefixer）+ Tailwind CSS，postcss.config.js 仅挂载 tailwindcss 与 autoprefixer 两个插件，保持极简。
-- 设计系统来源：shadcn/ui（components.json 中 style: new-york），通过 CLI 将无样式的 Radix 基础组件注入到 src/components/ui/，由开发者完全掌控源码。
-- 样式入口：src/index.css 使用 @tailwind base/components/utilities 三阶段导入，并通过 @layer 组织自定义样式；src/App.css 补充全局滚动选择器与滚动条样式。
+## 核心架构
+- 样式引擎：Tailwind CSS v3，PostCSS 处理 @tailwind 指令与 Autoprefixer 前缀补全
+- 组件库：shadcn/ui（new-york 风格），Radix UI 提供无样式可访问基础组件，通过 cva 生成变体类名
+- 主题系统：CSS 自定义属性（HSL）集中定义于 :root 与 .dark，通过 hsl(var(--xxx)) 在 Tailwind 中引用
+- 动画系统：tailwindcss-animate 插件 + 自定义 keyframes（accordion-down、wave、caret-blink）
 
-## 设计令牌（Design Tokens）
-所有颜色、圆角、阴影等令牌均以 HSL CSS 变量形式定义在 :root 与 .dark 下，遵循 shadcn 约定命名：
-- 语义色：--primary, --destructive, --muted, --accent。品牌主色为荔枝红 hsl(6 63% 54%)（#D44B3D）。
-- 表面色：--background, --card, --popover, --sidebar-*。明暗模式分别提供两套值。
-- 边框/焦点：--border, --input, --ring。ring 复用 primary 色实现聚焦态。
-- 几何：--radius。统一圆角基准，Tailwind 中扩展出 xs/sm/md/lg/xl。
-这些变量在 tailwind.config.js 中以 hsl(var(--xxx)) 形式映射到 Tailwind 颜色空间，使 bg-primary、text-destructive 等原子类自动跟随主题切换。
+## 设计令牌
+品牌主色为荔枝红 #D44B3D（HSL 6 63% 54%），所有语义化颜色（primary/secondary/accent/destructive/muted）均围绕此色调派生，同时维护完整的暗色模式映射。圆角统一使用 --radius 变量（0.75rem）并通过 xl/lg/md/sm/xs 层级扩展。
 
-## 组件样式策略
-- UI 组件（src/components/ui/*）：使用 class-variance-authority（cva）声明 variants（如 variant、size），配合 cn() 合并 className，避免硬编码样式。
-- 业务组件（src/sections/*）：直接组合 Tailwind 原子类，不引入额外 CSS 文件，保证样式可追踪。
-- 动画：tailwind.config.js 中通过 keyframes + animation 注册 accordion-down/up、caret-blink、wave 等微动效；src/index.css 的 .reveal / .reveal-stagger 配合 use-scroll-reveal.ts 实现滚动入场。
-
-## 响应式与深色模式
-- 深色模式通过 darkMode: ["class"] 切换，依赖父元素添加 .dark 类（通常由 shadcn 的 theme provider 控制）。
-- 断点沿用 Tailwind 默认 sm/md/lg/xl/2xl，结合 use-mobile.ts hook 在 JS 侧做逻辑分支。
+## 目录约定
+- src/index.css：全局样式入口，包含字体导入、Tailwind 层注入、CSS 变量主题、滚动入场动画（reveal/reveal-stagger）、聚光灯光晕（spotlight-card/glow）等通用 utility
+- src/App.css：浏览器级定制（平滑滚动、选中高亮、Webkit 滚动条）
+- src/components/ui/：shadcn/ui 生成的原子组件（Button/Card/Tooltip），每个组件用 cva 声明 variant/size 变体
+- tailwind.config.js：扩展字体族（Inter + Noto Sans SC）、颜色、圆角、阴影、动画 keyframes
+- components.json：shadcn/ui CLI 配置，别名指向 @/components/ui、@/lib/utils、@/hooks
 
 ## 开发规范
-1. 优先使用 Tailwind 原子类，仅在确实需要时写自定义 CSS 并放入 @layer utilities。
-2. 新增 UI 组件应放在 src/components/ui/，用 cva 声明变体，并通过 npx shadcn add <component> 生成。
-3. 调整主题只修改 src/index.css 中的 CSS 变量，不要直接写死颜色值。
-4. 图标统一使用 lucide（iconLibrary: "lucide"），通过 @/lib/utils 的 cn 函数合并 className。
+1. 优先使用 Tailwind 原子类，避免手写 CSS；仅在复杂交互（如 reveal 滚动动画、spotlight 光标追踪）时补充 @layer utilities
+2. 颜色一律走 CSS 变量，禁止硬编码色值；品牌色通过 text-primary / bg-primary 等语义类引用
+3. 组件样式通过 cva 管理，新增变体需在 variants 中声明，保持 class 组合可预测
+4. 深色模式通过 dark: 前缀，所有主题变量需同时覆盖 :root 与 .dark 两套值
+5. 动画统一在 tailwind.config.js 的 keyframes/animation 中注册，组件内仅引用命名动画

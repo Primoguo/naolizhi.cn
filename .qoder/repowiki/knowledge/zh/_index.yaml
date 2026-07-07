@@ -3,13 +3,25 @@ schema_version: 1
 locale: zh-CN
 branch: main
 nodes_managed: true
-exported_at: "2026-07-07T16:13:15Z"
+exported_at: "2026-07-07T16:43:35Z"
 modules:
     "":
-        dir_name: 挠荔枝 Knowledge 官网根工程（Vite + React 19 单页应用）
-        title: 挠荔枝 Knowledge 官网根工程（Vite + React 19 单页应用）
+        dir_name: 挠荔枝 Knowledge 官网项目根配置
+        title: 挠荔枝 Knowledge 官网项目根配置
         scope:
-            - '**'
+            - README.md
+            - .gitignore
+            - index.html
+            - package.json
+            - package-lock.json
+            - components.json
+            - eslint.config.js
+            - postcss.config.js
+            - tailwind.config.js
+            - tsconfig.json
+            - tsconfig.app.json
+            - tsconfig.node.json
+            - vite.config.ts
         source_files: []
         children: []
         depends_on: []
@@ -24,10 +36,9 @@ modules:
             - tsconfig.json
             - tsconfig.app.json
             - tsconfig.node.json
-            - eslint.config.js
             - tailwind.config.js
             - postcss.config.js
-            - components.json
+            - eslint.config.js
         children: []
         depends_on: []
         related_to: []
@@ -39,10 +50,10 @@ modules:
             - vite.config.ts
             - tailwind.config.js
             - postcss.config.js
+            - src/index.css
             - components.json
-            - package.json
             - tsconfig.json
-            - eslint.config.js
+            - package.json
         children: []
         depends_on: []
         related_to: []
@@ -53,6 +64,7 @@ modules:
         source_files:
             - package.json
             - package-lock.json
+            - .gitignore
         children: []
         depends_on: []
         related_to: []
@@ -71,10 +83,10 @@ modules:
         scope: []
         source_files:
             - tailwind.config.js
-            - postcss.config.js
             - src/index.css
-            - src/App.css
+            - postcss.config.js
             - components.json
+            - src/App.css
             - src/components/ui/button.tsx
         children: []
         depends_on: []
