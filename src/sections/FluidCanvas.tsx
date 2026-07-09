@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 // ===================== GLSL Shaders =====================
 
@@ -152,24 +153,45 @@ interface Program {
 
 export default function FluidCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // ---- prefers-reduced-motion 兜底：用户开启减少动画时，不渲染任何动画 ----
+    if (reducedMotion) return;
+
     // ---- 移动端降级：不跑 WebGL ----
     const isMobile = window.innerWidth < 768;
     if (isMobile) return;
 
-    const params = {
-      SIM_RESOLUTION: 128,
-      DYE_RESOLUTION: 512,
-      DENSITY_DISSIPATION: 0.94,     // 烟雾消散更快（更克制）
-      VELOCITY_DISSIPATION: 0.96,    // 速度衰减更快（不拖太长）
-      PRESSURE_ITERATIONS: 20,
-      SPLAT_RADIUS: 0.25,            // 烟雾范围更小
-      SPLAT_FORCE: 2500,             // 挥动力度更轻
+    // ---- 性能检测：根据设备能力动态调整参数 ----
+    const detectPerformance = () => {
+      const devicePixelRatio = window.devicePixelRatio || 1;
+      const hasLowEndGPU = devicePixelRatio <= 1;
+      const memoryInfo = (navigator as any).deviceMemory || 4;
+      const isLowMemory = memoryInfo < 4;
+      return { hasLowEndGPU, isLowMemory };
     };
+
+    const { hasLowEndGPU, isLowMemory } = detectPerformance();
+
+    const params = {
+      SIM_RESOLUTION: hasLowEndGPU || isLowMemory ? 96 : 128,
+      DYE_RESOLUTION: hasLowEndGPU || isLowMemory ? 256 : 512,
+      DENSITY_DISSIPATION: 0.94,
+      VELOCITY_DISSIPATION: 0.96,
+      PRESSURE_ITERATIONS: hasLowEndGPU || isLowMemory ? 10 : 20,
+      SPLAT_RADIUS: 0.25,
+      SPLAT_FORCE: 2500,
+    };
+
+    // ---- 运行时帧率监控 ----
+    let frameCount = 0;
+    let lastFpsUpdate = performance.now();
+    let currentFps = 60;
+    let isDegraded = false;
 
     // ---- WebGL context ----
     const gl = canvas.getContext("webgl", {
@@ -429,16 +451,37 @@ export default function FluidCanvas() {
     // ---- Animation loop ----
     let animId = 0;
     let lastTime = performance.now();
+    let skipFrameCounter = 0;
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
       if (!isVisible) return;
 
+      // 帧率监控
+      frameCount++;
       const now = performance.now();
+      if (now - lastFpsUpdate >= 1000) {
+        currentFps = frameCount;
+        frameCount = 0;
+        lastFpsUpdate = now;
+
+        // 当帧率持续低于 30fps 时，触发运行时性能降级
+        if (currentFps < 30 && !isDegraded) {
+          isDegraded = true;
+        } else if (currentFps >= 45 && isDegraded) {
+          isDegraded = false;
+        }
+      }
+
       const dt = Math.min((now - lastTime) / 1000, 0.016);
       lastTime = now;
 
-      // Inject splat on mouse move
+      // 性能降级：低帧率时跳过渲染帧
+      if (isDegraded) {
+        skipFrameCounter++;
+        if (skipFrameCounter % 2 !== 0) return;
+      }
+
       if (pointerMoved) {
         const color = colors[Math.floor(Math.random() * colors.length)];
         splat(pointerX, pointerY, pointerDX, pointerDY, color);

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 // ============== 类型定义 ==============
 
@@ -51,13 +52,19 @@ interface MouseTrail {
 const isMobile = () =>
   typeof window !== "undefined" && window.innerWidth < 768;
 
-const getParticleCounts = () => {
-  if (isMobile()) return { stars: 180, dust: 200 }; // 移动端也增加密度
-  return { stars: 600, dust: 450 }; // 桌面端大幅增加
+const getBaseParticleCounts = () => {
+  if (isMobile()) return { stars: 180, dust: 200 };
+  return { stars: 600, dust: 450 };
 };
 
-const STAR_COUNT = () => getParticleCounts().stars;
-const DUST_COUNT = () => getParticleCounts().dust;
+const detectPerformance = () => {
+  if (typeof window === "undefined") return { hasLowEndGPU: false, isLowMemory: false };
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  const hasLowEndGPU = devicePixelRatio <= 1;
+  const memoryInfo = (navigator as any).deviceMemory || 4;
+  const isLowMemory = memoryInfo < 4;
+  return { hasLowEndGPU, isLowMemory };
+};
 const TRAIL_LENGTH = 16;
 const MOUSE_TRAIL_MAX = 8;
 const MOUSE_INFLUENCE = 120;
@@ -105,13 +112,33 @@ const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 export default function EarParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const isVisibleRef = useRef(true); // 用于在动画循环中判断是否可见
+  const isVisibleRef = useRef(true);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    if (reducedMotion) {
+      return;
+    }
+
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
+
+    const { hasLowEndGPU, isLowMemory } = detectPerformance();
+    const isLowEndDevice = hasLowEndGPU || isLowMemory;
+
+    const getParticleCounts = () => {
+      const base = getBaseParticleCounts();
+      if (isLowEndDevice) {
+        return { stars: Math.floor(base.stars * 0.5), dust: Math.floor(base.dust * 0.5) };
+      }
+      return base;
+    };
+
+    const STAR_COUNT = getParticleCounts().stars;
+    const DUST_COUNT = getParticleCounts().dust;
 
     // IntersectionObserver：canvas 不可见时暂停动画，节省 CPU/GPU
     let intersectionObserver: IntersectionObserver | undefined;
@@ -202,8 +229,8 @@ export default function EarParticles() {
       };
     };
 
-    let stars: Star[] = Array.from({ length: STAR_COUNT() }, createStar);
-    let dustParticles: DustParticle[] = Array.from({ length: DUST_COUNT() }, createDust);
+    let stars: Star[] = Array.from({ length: STAR_COUNT }, createStar);
+    let dustParticles: DustParticle[] = Array.from({ length: DUST_COUNT }, createDust);
     let meteors: Meteor[] = [];
     let mouseTrails: MouseTrail[] = [];
 
@@ -248,8 +275,8 @@ export default function EarParticles() {
 
     const handleResize = () => {
       resize();
-      stars = Array.from({ length: STAR_COUNT() }, createStar);
-      dustParticles = Array.from({ length: DUST_COUNT() }, createDust);
+      stars = Array.from({ length: STAR_COUNT }, createStar);
+      dustParticles = Array.from({ length: DUST_COUNT }, createDust);
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
@@ -387,12 +414,40 @@ export default function EarParticles() {
       ctx.fill();
     };
 
+    // ========== 运行时帧率监控 ==========
+    let frameCount = 0;
+    let lastFpsUpdate = performance.now();
+    let currentFps = 60;
+    let isDegraded = false;
+    let skipFrameCounter = 0;
+
     // ========== 动画循环 ==========
     const animate = () => {
-      // 不可见时跳过绘制，但继续调度下一帧以保持响应
       if (!isVisibleRef.current) {
         animationId = requestAnimationFrame(animate);
         return;
+      }
+
+      frameCount++;
+      const now = performance.now();
+      if (now - lastFpsUpdate >= 1000) {
+        currentFps = frameCount;
+        frameCount = 0;
+        lastFpsUpdate = now;
+
+        if (currentFps < 30 && !isDegraded) {
+          isDegraded = true;
+        } else if (currentFps >= 45 && isDegraded) {
+          isDegraded = false;
+        }
+      }
+
+      if (isDegraded) {
+        skipFrameCounter++;
+        if (skipFrameCounter % 2 !== 0) {
+          animationId = requestAnimationFrame(animate);
+          return;
+        }
       }
 
       const w = window.innerWidth;
@@ -518,20 +573,20 @@ export default function EarParticles() {
       }
 
       // ====== 绘制 ======
-      // 1. 光粒（底层）
-      for (const d of dustParticles) drawDust(d);
-
-      // 2. 流星
-      for (const m of meteors) drawMeteor(m);
-
-      // 3. 星空
-      for (const s of stars) drawStar(s);
-
-      // 4. 鼠标光迹
-      drawMouseTrails();
-
-      // 5. 鼠标柔光大光晕（顶层，在星空之上）
-      drawCursorGlow();
+      if (!isDegraded) {
+        for (const d of dustParticles) drawDust(d);
+        for (const m of meteors) drawMeteor(m);
+        for (const s of stars) drawStar(s);
+        drawMouseTrails();
+        drawCursorGlow();
+      } else {
+        for (const s of stars) {
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size * 0.5, 0, Math.PI * 2);
+          ctx.fillStyle = s.color + s.alpha + ")";
+          ctx.fill();
+        }
+      }
 
       animationId = requestAnimationFrame(animate);
     };

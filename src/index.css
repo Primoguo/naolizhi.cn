@@ -242,3 +242,45 @@
   0%   { transform: scaleY(1); }
   100% { transform: scaleY(0.4); }
 }
+
+/* ========== prefers-reduced-motion 兜底 ========== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .reveal-stagger > * {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .animate-flow-pulse,
+  .animate-line-flow,
+  .animate-fade-in-up,
+  .animate-glow-pulse,
+  .animate-grid-move,
+  .animate-progress-flow,
+  .animate-button-glow,
+  .animate-chat-fade-in,
+  .animate-icon-rotate,
+  .animate-star-twinkle,
+  .animate-ray-expand {
+    animation: none !important;
+  }
+  
+  .typing-effect {
+    animation: none !important;
+    border-right: none !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    width: auto !important;
+  }
+}
