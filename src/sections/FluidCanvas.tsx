@@ -1,8 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
-// ===================== GLSL Shaders =====================
-
 const baseVertexShader = `
   precision highp float;
   attribute vec2 aPosition;
@@ -123,8 +121,6 @@ const displayShader = `
   }
 `;
 
-// ===================== Types =====================
-
 interface FBO {
   texture: WebGLTexture;
   fbo: WebGLFramebuffer;
@@ -149,7 +145,307 @@ interface Program {
   bind: () => void;
 }
 
-// ===================== Component =====================
+const colors: [number, number, number][] = [
+  [0.5, 0.3, 0.8],
+  [0.4, 0.2, 0.7],
+  [0.6, 0.35, 0.9],
+  [0.3, 0.4, 0.8],
+  [0.5, 0.25, 0.75],
+  [0.45, 0.3, 0.85],
+];
+
+function initWebGLFluid(
+  canvas: HTMLCanvasElement,
+  params: {
+    SIM_RESOLUTION: number;
+    DYE_RESOLUTION: number;
+    DENSITY_DISSIPATION: number;
+    VELOCITY_DISSIPATION: number;
+    PRESSURE_ITERATIONS: number;
+    SPLAT_RADIUS: number;
+    SPLAT_FORCE: number;
+  }
+): () => void {
+  const gl = canvas.getContext("webgl", {
+    alpha: true,
+    depth: false,
+    stencil: false,
+    antialias: false,
+    preserveDrawingBuffer: false,
+  });
+  if (!gl) return () => {};
+
+  gl.getExtension("OES_texture_half_float");
+  gl.getExtension("OES_texture_half_float_linear");
+
+  const compileShader = (type: number, source: string): WebGLShader => {
+    const shader = gl.createShader(type)!;
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    return shader;
+  };
+
+  const createProgram = (vertSrc: string, fragSrc: string): Program => {
+    const program = gl.createProgram()!;
+    gl.attachShader(program, compileShader(gl.VERTEX_SHADER, vertSrc));
+    gl.attachShader(program, compileShader(gl.FRAGMENT_SHADER, fragSrc));
+    gl.linkProgram(program);
+
+    const uniforms: Record<string, WebGLUniformLocation> = {};
+    const count = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < count; i++) {
+      const info = gl.getActiveUniform(program, i);
+      if (info) uniforms[info.name] = gl.getUniformLocation(program, info.name)!;
+    }
+
+    return {
+      program,
+      uniforms,
+      bind: () => gl.useProgram(program),
+    };
+  };
+
+  const quad = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, -1, 1, 1, 1, 1, -1]), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2, 0, 2, 3]), gl.STATIC_DRAW);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(0);
+
+  const blit = (target: FBO | null) => {
+    if (target) {
+      gl.viewport(0, 0, target.width, target.height);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo);
+    } else {
+      gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    }
+    gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+  };
+
+  const halfFloat = gl.getExtension("OES_texture_half_float");
+  const texType = halfFloat ? halfFloat.HALF_FLOAT_OES : gl.UNSIGNED_BYTE;
+
+  const createFBO = (w: number, h: number, filtering: number): FBO => {
+    const texture = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filtering);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filtering);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, texType, null);
+
+    const fbo = gl.createFramebuffer()!;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    return {
+      texture,
+      fbo,
+      width: w,
+      height: h,
+      attach: (id: number) => {
+        gl.activeTexture(gl.TEXTURE0 + id);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        return id;
+      },
+    };
+  };
+
+  const createDoubleFBO = (w: number, h: number, filtering: number): DoubleFBO => {
+    let fbo1 = createFBO(w, h, filtering);
+    let fbo2 = createFBO(w, h, filtering);
+    return {
+      width: w,
+      height: h,
+      texelSizeX: 1.0 / w,
+      texelSizeY: 1.0 / h,
+      get read() { return fbo1; },
+      get write() { return fbo2; },
+      swap() { const t = fbo1; fbo1 = fbo2; fbo2 = t; },
+    };
+  };
+
+  const splatProgram = createProgram(baseVertexShader, splatShader);
+  const advectionProgram = createProgram(baseVertexShader, advectionShader);
+  const divergenceProgram = createProgram(baseVertexShader, divergenceShader);
+  const pressureProgram = createProgram(baseVertexShader, pressureShader);
+  const gradientSubtractProgram = createProgram(baseVertexShader, gradientSubtractShader);
+  const displayProgram = createProgram(baseVertexShader, displayShader);
+
+  const getResolution = (resolution: number) => {
+    let aspectRatio = gl.drawingBufferWidth / gl.drawingBufferHeight;
+    if (aspectRatio < 1) aspectRatio = 1.0 / aspectRatio;
+    const min = Math.round(resolution);
+    const max = Math.round(resolution * aspectRatio);
+    return gl.drawingBufferWidth > gl.drawingBufferHeight
+      ? { width: max, height: min }
+      : { width: min, height: max };
+  };
+
+  let dye: DoubleFBO;
+  let velocity: DoubleFBO;
+  let divergenceFBO: FBO;
+  let pressure: DoubleFBO;
+
+  const initFramebuffers = () => {
+    const simRes = getResolution(params.SIM_RESOLUTION);
+    const dyeRes = getResolution(params.DYE_RESOLUTION);
+    velocity = createDoubleFBO(simRes.width, simRes.height, gl.LINEAR);
+    dye = createDoubleFBO(dyeRes.width, dyeRes.height, gl.LINEAR);
+    divergenceFBO = createFBO(simRes.width, simRes.height, gl.NEAREST);
+    pressure = createDoubleFBO(simRes.width, simRes.height, gl.NEAREST);
+  };
+
+  const resizeCanvas = () => {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = canvas.clientWidth * dpr;
+    canvas.height = canvas.clientHeight * dpr;
+    initFramebuffers();
+  };
+  resizeCanvas();
+
+  let pointerX = 0;
+  let pointerY = 0;
+  let pointerDX = 0;
+  let pointerDY = 0;
+  let pointerMoved = false;
+
+  const onPointerMove = (e: MouseEvent) => {
+    const rect = canvas.getBoundingClientRect();
+    const nx = (e.clientX - rect.left) / rect.width;
+    const ny = 1.0 - (e.clientY - rect.top) / rect.height;
+    pointerDX = (nx - pointerX) * params.SPLAT_FORCE;
+    pointerDY = (ny - pointerY) * params.SPLAT_FORCE;
+    pointerX = nx;
+    pointerY = ny;
+    pointerMoved = true;
+  };
+
+  const splat = (x: number, y: number, dx: number, dy: number, color: [number, number, number]) => {
+    splatProgram.bind();
+    gl.uniform1i(splatProgram.uniforms.uTarget, velocity.read.attach(0));
+    gl.uniform1f(splatProgram.uniforms.aspectRatio, canvas.width / canvas.height);
+    gl.uniform2f(splatProgram.uniforms.point, x, y);
+    gl.uniform3f(splatProgram.uniforms.color, dx, dy, 0.0);
+    gl.uniform1f(splatProgram.uniforms.radius, params.SPLAT_RADIUS / 100.0);
+    blit(velocity.write);
+    velocity.swap();
+
+    gl.uniform1i(splatProgram.uniforms.uTarget, dye.read.attach(0));
+    gl.uniform3f(splatProgram.uniforms.color, color[0], color[1], color[2]);
+    blit(dye.write);
+    dye.swap();
+  };
+
+  const step = (dt: number) => {
+    advectionProgram.bind();
+    gl.uniform2f(advectionProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
+    gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read.attach(0));
+    gl.uniform1i(advectionProgram.uniforms.uSource, velocity.read.attach(0));
+    gl.uniform1f(advectionProgram.uniforms.dt, dt);
+    gl.uniform1f(advectionProgram.uniforms.dissipation, params.VELOCITY_DISSIPATION);
+    blit(velocity.write);
+    velocity.swap();
+
+    gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read.attach(0));
+    gl.uniform1i(advectionProgram.uniforms.uSource, dye.read.attach(1));
+    gl.uniform1f(advectionProgram.uniforms.dissipation, params.DENSITY_DISSIPATION);
+    blit(dye.write);
+    dye.swap();
+
+    divergenceProgram.bind();
+    gl.uniform2f(divergenceProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
+    gl.uniform1i(divergenceProgram.uniforms.uVelocity, velocity.read.attach(0));
+    blit(divergenceFBO);
+
+    pressureProgram.bind();
+    gl.uniform2f(pressureProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
+    gl.uniform1i(pressureProgram.uniforms.uDivergence, divergenceFBO.attach(0));
+    for (let i = 0; i < params.PRESSURE_ITERATIONS; i++) {
+      gl.uniform1i(pressureProgram.uniforms.uPressure, pressure.read.attach(1));
+      blit(pressure.write);
+      pressure.swap();
+    }
+
+    gradientSubtractProgram.bind();
+    gl.uniform2f(gradientSubtractProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
+    gl.uniform1i(gradientSubtractProgram.uniforms.uPressure, pressure.read.attach(0));
+    gl.uniform1i(gradientSubtractProgram.uniforms.uVelocity, velocity.read.attach(1));
+    blit(velocity.write);
+    velocity.swap();
+  };
+
+  const render = () => {
+    displayProgram.bind();
+    gl.uniform1i(displayProgram.uniforms.uTexture, dye.read.attach(0));
+    blit(null);
+  };
+
+  let isVisible = true;
+  const observer = new IntersectionObserver(
+    (entries) => { isVisible = entries[0].isIntersecting; },
+    { threshold: 0.01 }
+  );
+  observer.observe(canvas);
+
+  let animId = 0;
+  let lastTime = performance.now();
+  let frameCount = 0;
+  let lastFpsUpdate = performance.now();
+  let currentFps = 60;
+  let isDegraded = false;
+  let skipFrameCounter = 0;
+
+  const animate = () => {
+    animId = requestAnimationFrame(animate);
+    if (!isVisible) return;
+
+    frameCount++;
+    const now = performance.now();
+    if (now - lastFpsUpdate >= 1000) {
+      currentFps = frameCount;
+      frameCount = 0;
+      lastFpsUpdate = now;
+      if (currentFps < 30 && !isDegraded) {
+        isDegraded = true;
+      } else if (currentFps >= 45 && isDegraded) {
+        isDegraded = false;
+      }
+    }
+
+    const dt = Math.min((now - lastTime) / 1000, 0.016);
+    lastTime = now;
+
+    if (isDegraded) {
+      skipFrameCounter++;
+      if (skipFrameCounter % 2 !== 0) return;
+    }
+
+    if (pointerMoved) {
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      splat(pointerX, pointerY, pointerDX, pointerDY, color);
+      pointerMoved = false;
+    }
+
+    step(dt);
+    render();
+  };
+
+  window.addEventListener("mousemove", onPointerMove, { passive: true });
+  window.addEventListener("resize", resizeCanvas);
+
+  animate();
+
+  return () => {
+    cancelAnimationFrame(animId);
+    observer.disconnect();
+    window.removeEventListener("mousemove", onPointerMove);
+    window.removeEventListener("resize", resizeCanvas);
+  };
+}
 
 export default function FluidCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -159,14 +455,10 @@ export default function FluidCanvas() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // ---- prefers-reduced-motion 兜底：用户开启减少动画时，不渲染任何动画 ----
-    if (reducedMotion) return;
+    if (reducedMotion) {
+      return;
+    }
 
-    // ---- 移动端降级：不跑 WebGL ----
-    const isMobile = window.innerWidth < 768;
-    if (isMobile) return;
-
-    // ---- 性能检测：根据设备能力动态调整参数 ----
     const detectPerformance = () => {
       const devicePixelRatio = window.devicePixelRatio || 1;
       const hasLowEndGPU = devicePixelRatio <= 1;
@@ -187,326 +479,18 @@ export default function FluidCanvas() {
       SPLAT_FORCE: 2500,
     };
 
-    // ---- 运行时帧率监控 ----
-    let frameCount = 0;
-    let lastFpsUpdate = performance.now();
-    let currentFps = 60;
-    let isDegraded = false;
+    const cleanup = initWebGLFluid(canvas, params);
 
-    // ---- WebGL context ----
-    const gl = canvas.getContext("webgl", {
-      alpha: true,
-      depth: false,
-      stencil: false,
-      antialias: false,
-      preserveDrawingBuffer: false,
-    });
-    if (!gl) return;
-
-    gl.getExtension("OES_texture_half_float");
-    gl.getExtension("OES_texture_half_float_linear");
-
-    // ---- Helpers ----
-    const compileShader = (type: number, source: string): WebGLShader => {
-      const shader = gl.createShader(type)!;
-      gl.shaderSource(shader, source);
-      gl.compileShader(shader);
-      return shader;
-    };
-
-    const createProgram = (vertSrc: string, fragSrc: string): Program => {
-      const program = gl.createProgram()!;
-      gl.attachShader(program, compileShader(gl.VERTEX_SHADER, vertSrc));
-      gl.attachShader(program, compileShader(gl.FRAGMENT_SHADER, fragSrc));
-      gl.linkProgram(program);
-
-      const uniforms: Record<string, WebGLUniformLocation> = {};
-      const count = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-      for (let i = 0; i < count; i++) {
-        const info = gl.getActiveUniform(program, i);
-        if (info) uniforms[info.name] = gl.getUniformLocation(program, info.name)!;
-      }
-
-      return {
-        program,
-        uniforms,
-        bind: () => gl.useProgram(program),
-      };
-    };
-
-    // ---- Fullscreen quad ----
-    const quad = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, -1, 1, 1, 1, 1, -1]), gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2, 0, 2, 3]), gl.STATIC_DRAW);
-    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(0);
-
-    const blit = (target: FBO | null) => {
-      if (target) {
-        gl.viewport(0, 0, target.width, target.height);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo);
-      } else {
-        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      }
-      gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-    };
-
-    // ---- FBO creation ----
-    const halfFloat = gl.getExtension("OES_texture_half_float");
-    const texType = halfFloat ? halfFloat.HALF_FLOAT_OES : gl.UNSIGNED_BYTE;
-
-    const createFBO = (w: number, h: number, filtering: number): FBO => {
-      const texture = gl.createTexture()!;
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filtering);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filtering);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, texType, null);
-
-      const fbo = gl.createFramebuffer()!;
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-      return {
-        texture,
-        fbo,
-        width: w,
-        height: h,
-        attach: (id: number) => {
-          gl.activeTexture(gl.TEXTURE0 + id);
-          gl.bindTexture(gl.TEXTURE_2D, texture);
-          return id;
-        },
-      };
-    };
-
-    const createDoubleFBO = (w: number, h: number, filtering: number): DoubleFBO => {
-      let fbo1 = createFBO(w, h, filtering);
-      let fbo2 = createFBO(w, h, filtering);
-      return {
-        width: w,
-        height: h,
-        texelSizeX: 1.0 / w,
-        texelSizeY: 1.0 / h,
-        get read() { return fbo1; },
-        get write() { return fbo2; },
-        swap() { const t = fbo1; fbo1 = fbo2; fbo2 = t; },
-      };
-    };
-
-    // ---- Programs ----
-    const splatProgram = createProgram(baseVertexShader, splatShader);
-    const advectionProgram = createProgram(baseVertexShader, advectionShader);
-    const divergenceProgram = createProgram(baseVertexShader, divergenceShader);
-    const pressureProgram = createProgram(baseVertexShader, pressureShader);
-    const gradientSubtractProgram = createProgram(baseVertexShader, gradientSubtractShader);
-    const displayProgram = createProgram(baseVertexShader, displayShader);
-
-    // ---- Resolution ----
-    const getResolution = (resolution: number) => {
-      let aspectRatio = gl.drawingBufferWidth / gl.drawingBufferHeight;
-      if (aspectRatio < 1) aspectRatio = 1.0 / aspectRatio;
-      const min = Math.round(resolution);
-      const max = Math.round(resolution * aspectRatio);
-      return gl.drawingBufferWidth > gl.drawingBufferHeight
-        ? { width: max, height: min }
-        : { width: min, height: max };
-    };
-
-    // ---- Init FBOs ----
-    let dye: DoubleFBO;
-    let velocity: DoubleFBO;
-    let divergenceFBO: FBO;
-    let pressure: DoubleFBO;
-
-    const initFramebuffers = () => {
-      const simRes = getResolution(params.SIM_RESOLUTION);
-      const dyeRes = getResolution(params.DYE_RESOLUTION);
-      velocity = createDoubleFBO(simRes.width, simRes.height, gl.LINEAR);
-      dye = createDoubleFBO(dyeRes.width, dyeRes.height, gl.LINEAR);
-      divergenceFBO = createFBO(simRes.width, simRes.height, gl.NEAREST);
-      pressure = createDoubleFBO(simRes.width, simRes.height, gl.NEAREST);
-    };
-
-    // ---- Resize ----
-    const resizeCanvas = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = canvas.clientWidth * dpr;
-      canvas.height = canvas.clientHeight * dpr;
-      initFramebuffers();
-    };
-    resizeCanvas();
-
-    // ---- Mouse ----
-    let pointerX = 0;
-    let pointerY = 0;
-    let pointerDX = 0;
-    let pointerDY = 0;
-    let pointerMoved = false;
-
-    const onPointerMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      const nx = (e.clientX - rect.left) / rect.width;
-      const ny = 1.0 - (e.clientY - rect.top) / rect.height;
-      pointerDX = (nx - pointerX) * params.SPLAT_FORCE;
-      pointerDY = (ny - pointerY) * params.SPLAT_FORCE;
-      pointerX = nx;
-      pointerY = ny;
-      pointerMoved = true;
-    };
-
-    window.addEventListener("mousemove", onPointerMove, { passive: true });
-    window.addEventListener("resize", resizeCanvas);
-
-    // ---- Splat ----
-    const splat = (x: number, y: number, dx: number, dy: number, color: [number, number, number]) => {
-      splatProgram.bind();
-      gl.uniform1i(splatProgram.uniforms.uTarget, velocity.read.attach(0));
-      gl.uniform1f(splatProgram.uniforms.aspectRatio, canvas.width / canvas.height);
-      gl.uniform2f(splatProgram.uniforms.point, x, y);
-      gl.uniform3f(splatProgram.uniforms.color, dx, dy, 0.0);
-      gl.uniform1f(splatProgram.uniforms.radius, params.SPLAT_RADIUS / 100.0);
-      blit(velocity.write);
-      velocity.swap();
-
-      gl.uniform1i(splatProgram.uniforms.uTarget, dye.read.attach(0));
-      gl.uniform3f(splatProgram.uniforms.color, color[0], color[1], color[2]);
-      blit(dye.write);
-      dye.swap();
-    };
-
-    // ---- Color palette (nebula-like, very subtle) ----
-    const colors: [number, number, number][] = [
-      [0.3, 0.25, 0.6],   // 蓝紫（星云主色）
-      [0.4, 0.15, 0.5],   // 深紫（暗调）
-      [0.5, 0.2, 0.4],    // 粉紫（柔和）
-      [0.2, 0.35, 0.5],   // 青蓝（冷色）
-      [0.35, 0.2, 0.55],  // 靛紫（深邃）
-      [0.25, 0.3, 0.45],  // 灰蓝（低调）
-    ];
-
-    // ---- Simulation step ----
-    const step = (dt: number) => {
-      // Advection
-      advectionProgram.bind();
-      gl.uniform2f(advectionProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
-      gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read.attach(0));
-      gl.uniform1i(advectionProgram.uniforms.uSource, velocity.read.attach(0));
-      gl.uniform1f(advectionProgram.uniforms.dt, dt);
-      gl.uniform1f(advectionProgram.uniforms.dissipation, params.VELOCITY_DISSIPATION);
-      blit(velocity.write);
-      velocity.swap();
-
-      gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read.attach(0));
-      gl.uniform1i(advectionProgram.uniforms.uSource, dye.read.attach(1));
-      gl.uniform1f(advectionProgram.uniforms.dissipation, params.DENSITY_DISSIPATION);
-      blit(dye.write);
-      dye.swap();
-
-      // Divergence
-      divergenceProgram.bind();
-      gl.uniform2f(divergenceProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
-      gl.uniform1i(divergenceProgram.uniforms.uVelocity, velocity.read.attach(0));
-      blit(divergenceFBO);
-
-      // Pressure solve (Jacobi)
-      pressureProgram.bind();
-      gl.uniform2f(pressureProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
-      gl.uniform1i(pressureProgram.uniforms.uDivergence, divergenceFBO.attach(0));
-      for (let i = 0; i < params.PRESSURE_ITERATIONS; i++) {
-        gl.uniform1i(pressureProgram.uniforms.uPressure, pressure.read.attach(1));
-        blit(pressure.write);
-        pressure.swap();
-      }
-
-      // Gradient subtract
-      gradientSubtractProgram.bind();
-      gl.uniform2f(gradientSubtractProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
-      gl.uniform1i(gradientSubtractProgram.uniforms.uPressure, pressure.read.attach(0));
-      gl.uniform1i(gradientSubtractProgram.uniforms.uVelocity, velocity.read.attach(1));
-      blit(velocity.write);
-      velocity.swap();
-    };
-
-    // ---- Render ----
-    const render = () => {
-      displayProgram.bind();
-      gl.uniform1i(displayProgram.uniforms.uTexture, dye.read.attach(0));
-      blit(null);
-    };
-
-    // ---- IntersectionObserver: 不可见时暂停 ----
-    let isVisible = true;
-    const observer = new IntersectionObserver(
-      (entries) => { isVisible = entries[0].isIntersecting; },
-      { threshold: 0.01 }
-    );
-    observer.observe(canvas);
-
-    // ---- Animation loop ----
-    let animId = 0;
-    let lastTime = performance.now();
-    let skipFrameCounter = 0;
-
-    const animate = () => {
-      animId = requestAnimationFrame(animate);
-      if (!isVisible) return;
-
-      // 帧率监控
-      frameCount++;
-      const now = performance.now();
-      if (now - lastFpsUpdate >= 1000) {
-        currentFps = frameCount;
-        frameCount = 0;
-        lastFpsUpdate = now;
-
-        // 当帧率持续低于 30fps 时，触发运行时性能降级
-        if (currentFps < 30 && !isDegraded) {
-          isDegraded = true;
-        } else if (currentFps >= 45 && isDegraded) {
-          isDegraded = false;
-        }
-      }
-
-      const dt = Math.min((now - lastTime) / 1000, 0.016);
-      lastTime = now;
-
-      // 性能降级：低帧率时跳过渲染帧
-      if (isDegraded) {
-        skipFrameCounter++;
-        if (skipFrameCounter % 2 !== 0) return;
-      }
-
-      if (pointerMoved) {
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        splat(pointerX, pointerY, pointerDX, pointerDY, color);
-        pointerMoved = false;
-      }
-
-      step(dt);
-      render();
-    };
-
-    animate();
-
-    return () => {
-      cancelAnimationFrame(animId);
-      observer.disconnect();
-      window.removeEventListener("mousemove", onPointerMove);
-      window.removeEventListener("resize", resizeCanvas);
-    };
-  }, []);
+    return cleanup;
+  }, [reducedMotion]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 z-0 pointer-events-none"
-      style={{ width: "100vw", height: "100vh" }}
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        className="fixed inset-0 z-0 pointer-events-none"
+        style={{ width: "100vw", height: "100vh" }}
+      />
+    </>
   );
 }
