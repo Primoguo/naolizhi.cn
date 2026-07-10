@@ -235,6 +235,34 @@
       transparent 60%
     );
   }
+
+  /* ========== 文字逐字流动动画 ========== */
+  @keyframes text-flow {
+    0% {
+      opacity: 0;
+      transform: translateY(12px);
+      filter: blur(4px);
+    }
+    20% {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    80% {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    100% {
+      opacity: 0.4;
+      transform: translateY(-4px);
+      filter: blur(1px);
+    }
+  }
+  .text-flow-char {
+    color: rgba(255, 255, 255, 0.4);
+    animation: text-flow 3s ease-in-out infinite;
+  }
 }
 
 /* ========== 波形动画 ========== */
