@@ -52,7 +52,14 @@ export default function Footer() {
           <div className="flex items-center gap-4 text-xs text-muted-foreground/90">
             <span>naolizhi.cn</span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-            <span>备案中</span>
+            <a
+              href="https://beian.miit.gov.cn/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors"
+            >
+              沪ICP备2026030941号-1
+            </a>
           </div>
         </div>
       </div>

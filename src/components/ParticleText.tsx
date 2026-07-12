@@ -202,6 +202,16 @@ export default function ParticleText() {
     let mouseX = -9999;
     let mouseY = -9999;
     let lastMouseMove = 0;
+    let isVisible = true;
+
+    // 可见性检测：不在视口时暂停动画，节省 CPU
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(canvas);
 
     const handleMouseMove = (e: MouseEvent) => {
       const now = performance.now();
@@ -236,6 +246,11 @@ export default function ParticleText() {
     };
 
     const draw = () => {
+      if (!isVisible) {
+        animationId = requestAnimationFrame(draw);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
       time += 0.016;
 
@@ -249,20 +264,9 @@ export default function ParticleText() {
       const kickDecay = Math.exp(-beatPhase * 8);
       const kick = kickDecay * kickDecay;
 
-      // 军鼓：第 2、4 拍（off-beat）
-      const offBeatPhase = ((time + beatDuration) % beatDuration) / beatDuration;
-      const snareDecay = Math.exp(-offBeatPhase * 6);
-      const snare = snareDecay * snareDecay * 0.6;
-
       // Hi-hat：16 分音符碎拍
       const hihatPhase = (time % (beatDuration / 4)) / (beatDuration / 4);
       const hihat = Math.exp(-hihatPhase * 12) * 0.3;
-
-      // 低频 Bass：缓慢起伏的正弦波
-      const bass = (Math.sin(time * 0.4) + 1) * 0.5 * 0.4;
-
-      // 综合节拍强度
-      const beatIntensity = kick * 0.5 + snare * 0.25 + hihat * 0.15 + bass * 0.1;
 
       // 声波传播：从中心向外扩散的涟漪
       const waveSpeed = 180; // 像素/秒
@@ -421,6 +425,7 @@ export default function ParticleText() {
 
     return () => {
       cancelAnimationFrame(animationId);
+      observer.disconnect();
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseleave", handleMouseLeave);
     };
