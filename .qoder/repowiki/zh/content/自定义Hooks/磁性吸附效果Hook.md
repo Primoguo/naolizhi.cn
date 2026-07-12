@@ -13,10 +13,11 @@
 
 ## 更新摘要
 **变更内容**   
-- 新增Hero组件中的高级磁性吸附实现，支持距离阈值和动态强度控制
-- 扩展了磁性吸附的使用场景，从简单的按钮吸附到复杂的交互式元素
-- 新增对cubic-bezier缓动函数的支持，提供更自然的动画体验
-- 增强了Hook的功能性，支持更精确的距离计算和吸引力控制
+- 在Hero组件中实现了独立的高级版磁性吸附Hook，支持距离阈值控制和动态强度调整
+- 基础版useMagnetic Hook保持简洁，专注于简单的按钮吸附效果
+- 高级版使用React state管理偏移量，提供更自然的物理模拟效果
+- 新增cubic-bezier缓动函数支持，提升动画的自然感和流畅度
+- 与新的Hero组件深度集成，展示复杂交互场景的实现方式
 
 ## 目录
 1. [简介](#简介)
@@ -33,7 +34,7 @@
 ## 简介
 本文件为 useMagnetic Hook 的完整技术文档，聚焦于"磁性吸附"交互效果的实现原理、参数配置与使用方式。该 Hook 通过监听鼠标移动事件，计算元素中心与指针的相对位移，并以线性缩放的方式将元素向鼠标方向偏移；当鼠标离开时，元素平滑回到原位。配合 CSS transform 与 transition，可形成自然的"被吸引"视觉反馈。
 
-**更新** 现已支持两种实现模式：基础版用于简单按钮吸附，高级版用于复杂交互场景，支持距离阈值控制和动态强度调整。
+**更新** 现已提供两种实现版本：基础版用于简单按钮吸附，高级版用于复杂交互场景，支持距离阈值控制和动态强度调整。
 
 ## 项目结构
 本项目采用按功能组织的前端结构：
@@ -67,16 +68,16 @@ C1 -.-> C2
 
 **图表来源**
 - [use-magnetic.ts:1-32](file://src/hooks/use-magnetic.ts#L1-L32)
-- [Hero.tsx:5-40](file://src/sections/Hero.tsx#L5-L40)
-- [CTA.tsx:1-65](file://src/sections/CTA.tsx#L1-L65)
+- [Hero.tsx:5-35](file://src/sections/Hero.tsx#L5-L35)
+- [CTA.tsx:1-71](file://src/sections/CTA.tsx#L1-L71)
 - [Navbar.tsx:1-117](file://src/sections/Navbar.tsx#L1-L117)
 - [index.css:80-116](file://src/index.css#L80-L116)
 - [App.css:1-29](file://src/App.css#L1-L29)
 
 章节来源
 - [use-magnetic.ts:1-32](file://src/hooks/use-magnetic.ts#L1-L32)
-- [Hero.tsx:1-198](file://src/sections/Hero.tsx#L1-L198)
-- [CTA.tsx:1-65](file://src/sections/CTA.tsx#L1-L65)
+- [Hero.tsx:1-146](file://src/sections/Hero.tsx#L1-L146)
+- [CTA.tsx:1-71](file://src/sections/CTA.tsx#L1-L71)
 - [Navbar.tsx:1-117](file://src/sections/Navbar.tsx#L1-L117)
 - [index.css:80-116](file://src/index.css#L80-L116)
 - [App.css:1-29](file://src/App.css#L1-L29)
@@ -105,7 +106,7 @@ C1 -.-> C2
 
 **章节来源**
 - [use-magnetic.ts:1-32](file://src/hooks/use-magnetic.ts#L1-L32)
-- [Hero.tsx:5-40](file://src/sections/Hero.tsx#L5-L40)
+- [Hero.tsx:5-35](file://src/sections/Hero.tsx#L5-L35)
 
 ## 架构总览
 从调用方到渲染层的整体流程如下：
@@ -132,8 +133,8 @@ DOM-->>U : 元素自然吸附效果
 
 **图表来源**
 - [use-magnetic.ts:10-28](file://src/hooks/use-magnetic.ts#L10-L28)
-- [Hero.tsx:9-37](file://src/sections/Hero.tsx#L9-L37)
-- [CTA.tsx:28-42](file://src/sections/CTA.tsx#L28-L42)
+- [Hero.tsx:10-32](file://src/sections/Hero.tsx#L10-L32)
+- [CTA.tsx:35-41](file://src/sections/CTA.tsx#L35-L41)
 - [Navbar.tsx:11-26](file://src/sections/Navbar.tsx#L11-L26)
 
 ## 详细组件分析
@@ -177,11 +178,11 @@ Render --> End(["结束"])
 
 **图表来源**
 - [use-magnetic.ts:10-22](file://src/hooks/use-magnetic.ts#L10-L22)
-- [Hero.tsx:16-32](file://src/sections/Hero.tsx#L16-L32)
+- [Hero.tsx:16-28](file://src/sections/Hero.tsx#L16-L28)
 
 章节来源
 - [use-magnetic.ts:10-28](file://src/hooks/use-magnetic.ts#L10-L28)
-- [Hero.tsx:9-37](file://src/sections/Hero.tsx#L9-L37)
+- [Hero.tsx:10-32](file://src/sections/Hero.tsx#L10-L32)
 
 ### 参数配置说明
 
@@ -208,9 +209,9 @@ Render --> End(["结束"])
 
 **章节来源**
 - [use-magnetic.ts:7-22](file://src/hooks/use-magnetic.ts#L7-L22)
-- [Hero.tsx:5-33](file://src/sections/Hero.tsx#L5-L33)
-- [CTA.tsx:35](file://src/sections/CTA.tsx#L35)
-- [Navbar.tsx:17](file://src/sections/Navbar.tsx#L17)
+- [Hero.tsx:6-28](file://src/sections/Hero.tsx#L6-L28)
+- [CTA.tsx:7](file://src/sections/CTA.tsx#L7)
+- [Navbar.tsx:12](file://src/sections/Navbar.tsx#L12)
 
 ### 使用示例
 
@@ -230,8 +231,8 @@ Render --> End(["结束"])
 
 **章节来源**
 - [Navbar.tsx:11-26](file://src/sections/Navbar.tsx#L11-L26)
-- [CTA.tsx:28-42](file://src/sections/CTA.tsx#L28-L42)
-- [Hero.tsx:172-197](file://src/sections/Hero.tsx#L172-L197)
+- [CTA.tsx:35-41](file://src/sections/CTA.tsx#L35-L41)
+- [Hero.tsx:120-145](file://src/sections/Hero.tsx#L120-L145)
 
 ### 3D 变换与 CSS 过渡的配合
 - 若需加入 3D 旋转或透视，可在外层容器上设置 perspective 与 rotateX/Y/Z，再叠加 translate
@@ -246,7 +247,7 @@ Render --> End(["结束"])
 **章节来源**
 - [index.css:80-116](file://src/index.css#L80-L116)
 - [App.css:1-29](file://src/App.css#L1-L29)
-- [Hero.tsx:182](file://src/sections/Hero.tsx#L182)
+- [Hero.tsx:130](file://src/sections/Hero.tsx#L130)
 
 ## 依赖关系分析
 - 模块耦合
@@ -273,9 +274,9 @@ B -.-> D
 - [use-magnetic.ts:1-32](file://src/hooks/use-magnetic.ts#L1-L32)
 
 章节来源
-- [CTA.tsx:1-65](file://src/sections/CTA.tsx#L1-L65)
+- [CTA.tsx:1-71](file://src/sections/CTA.tsx#L1-L71)
 - [Navbar.tsx:1-117](file://src/sections/Navbar.tsx#L1-L117)
-- [Hero.tsx:1-198](file://src/sections/Hero.tsx#L1-L198)
+- [Hero.tsx:1-146](file://src/sections/Hero.tsx#L1-L146)
 - [use-magnetic.ts:1-32](file://src/hooks/use-magnetic.ts#L1-L32)
 
 ## 性能考量
@@ -295,7 +296,7 @@ B -.-> D
 
 **章节来源**
 - [FluidCanvas.tsx:429-460](file://src/sections/FluidCanvas.tsx#L429-L460)
-- [Hero.tsx:16-32](file://src/sections/Hero.tsx#L16-L32)
+- [Hero.tsx:16-28](file://src/sections/Hero.tsx#L16-L28)
 
 ## 故障排查指南
 - 现象：鼠标移动无吸附效果
@@ -318,8 +319,8 @@ B -.-> D
 
 **章节来源**
 - [use-magnetic.ts:10-28](file://src/hooks/use-magnetic.ts#L10-L28)
-- [Hero.tsx:9-37](file://src/sections/Hero.tsx#L9-L37)
-- [CTA.tsx:28-42](file://src/sections/CTA.tsx#L28-L42)
+- [Hero.tsx:10-32](file://src/sections/Hero.tsx#L10-L32)
+- [CTA.tsx:35-41](file://src/sections/CTA.tsx#L35-L41)
 - [Navbar.tsx:11-26](file://src/sections/Navbar.tsx#L11-L26)
 
 ## 结论

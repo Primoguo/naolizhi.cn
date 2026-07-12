@@ -1,1 +1,0 @@
-该仓库是一个基于 Vite + React 19 的前端单页官网项目，代码中未发现任何日志框架（如 winston、pino、bunyan、debug 等）的引入与使用，也未在 src 目录下找到 console.log / logger / logging 等相关调用。项目依赖清单（package.json）中同样不包含任何日志相关包。因此本项目当前不存在专用的日志系统或结构化日志规范。
