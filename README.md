@@ -78,17 +78,12 @@ npm run preview
 
 ## 部署
 
-站点部署在阿里云 ECS（Ubuntu 24.04），使用 Nginx + Let's Encrypt SSL。
+站点部署在阿里云 ECS，使用 Nginx + Let's Encrypt SSL。
 
 ```bash
 # 一键部署
 ./deploy.sh
 ```
-
-- **域名**：naolizhi.cn
-- **服务器**：47.93.160.137
-- **SSL**：Let's Encrypt 自动续期
-- **备案**：沪ICP备2026030941号-1
 
 ## 品牌
 
